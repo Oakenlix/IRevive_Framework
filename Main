@@ -12,7 +12,7 @@ Script_Version := 1.1
 Center_X := A_ScreenWidth/2
 Center_Y := A_ScreenHeight/2
 
-Updated_Version := URLDownloadToVar("https://raw.githubusercontent.com/Oakenlix/IRevive_Plenka/main/Update")
+Updated_Version := URLDownloadToVar("https://raw.githubusercontent.com/Oakenlix/IRevive_Framework/main/Update")
 
 If Updated_Version
 {
@@ -20,7 +20,7 @@ RegexMatch(Updated_Version, "\w.\w", Updated_Version)
 
 If (Script_Version != Updated_Version)
 	{
-		Updated_text := URLDownloadToVar("https://raw.githubusercontent.com/Oakenlix/IRevive_Plenka/main/Main")
+		Updated_text := URLDownloadToVar("https://raw.githubusercontent.com/Oakenlix/IRevive_Framework/main/Main")
 		FileCreateDir, %A_ScriptDir%\Backups
 		FileMove, %A_ScriptName%, %A_ScriptDir%\Backups\%A_Hour%%A_Min%-%A_DD%%A_MM%.ahk
 		FileAppend, %Updated_text%, %A_ScriptName%
@@ -40,7 +40,7 @@ URLDownloadToVar(url)
 	}
 	catch  ; Handles the first error/exception raised by the block above.
 	{
-		MsgBox, Нет подключения к интернету.
+		MsgBox, 262144, Ошибка, Нет подключения к интернету.
 	}
 }
 
@@ -84,14 +84,7 @@ IniRead, W_Etiketka, Settings.ini, WB, W_Etiketka
 
 
 LoadMainGUI()
-} ; СТАРТ
-
 return
-
-
-
-{ ;############################################### GUI
-
 
 LoadMainGUI()
 {
@@ -116,17 +109,10 @@ SpawnGUI()
 		WinSet, AlwaysOnTop, On, %A_ScriptName%
 }
 
-ButtonСохранить:
-Gui, Submit, NoHide 
-IniWrite, %username%, Settings.ini, user, name
-IniWrite, %setontop%, Settings.ini, user, setontop
-If SETONTOP
-	WinSet, AlwaysOnTop, On, %A_ScriptName%
-If !SETONTOP
-	WinSet, AlwaysOnTop, Off, %A_ScriptName%
-return
+} ; СТАРТ
 
 
+{ ;############################################### GUI LABELS
 
 GuiSize:
 AdjustSize()
@@ -151,6 +137,19 @@ ExitFunc()
 	size_y -= 29
 	IniWrite, x%gui_x% y%gui_y% w%size_x% h%size_y%, Settings.ini, window position, gui_position
 }
+ButtonВыйти:
+GuiClose:  ; When the window is closed.
+ExitApp
+
+ButtonСохранить:
+Gui, Submit, NoHide 
+IniWrite, %username%, Settings.ini, user, name
+IniWrite, %setontop%, Settings.ini, user, setontop
+If SETONTOP
+	WinSet, AlwaysOnTop, On, %A_ScriptName%
+If !SETONTOP
+	WinSet, AlwaysOnTop, Off, %A_ScriptName%
+return
 
 ButtonНастройки:
 MARKETPLACE := 
@@ -158,12 +157,6 @@ ExitFunc()
 Gui, Destroy
 LoadMainGUI()
 return
-
-ButtonВыйти:
-GuiClose:  ; When the window is closed.
-;ExitFunc()
-ExitApp
-
 
 MyTable:
 if (A_GuiEvent = "DoubleClick")
@@ -193,7 +186,6 @@ ControlGet, ListviewContent, List,, SysListView321, %A_ScriptName%
 Clipboard := ListviewContent
 }
 return
-
 
 ButtonПереместить:
 InputBox, supplyId, %A_ScriptName%, Введите ID поставки, , 250, 130
@@ -226,8 +218,42 @@ If (SHOP_ID == "UEPlenka")
 	CLIENTID := 563560
 	APIKEY := "8d5da2ed-df09-424d-b48f-f1800c75d39d"
 }
+If (SHOP_ID == "Защита V10")
+{
+	CLIENTID := 440022
+	APIKEY := "7e655181-7121-4d94-8d63-00531ab22fd2"
+}
+If (SHOP_ID == "ОБА")
+{
+	CLIENTID := 128494
+	APIKEY := "c6c2235a-289c-48b6-90c1-1a06dfb37ce1"
+}
+If (SHOP_ID == "Оптовая база")
+{
+	CLIENTID := 266046
+	APIKEY := "7b6879f1-1458-4a37-8c9b-3a5b978dafe8"
+}
+If (SHOP_ID == "Премиум")
+{
+	CLIENTID := 440833
+	APIKEY := "5efa14da-100f-477f-8e37-5b69ab4605e0"
+}
+If (SHOP_ID == "Просто надо")
+{
+	CLIENTID := 1147847
+	APIKEY := "aa5b284f-7f4d-486b-a9cb-e6f4952f4e04"
+}
+If (SHOP_ID == "Просто надо покупать")
+{
+	CLIENTID := 718802
+	APIKEY := "63b81af9-3d65-44d9-aec8-88b72c7acec8"
+}
+If (SHOP_ID == "НК")
+{
+	CLIENTID := 563357
+	APIKEY := "33dabb9c-65c9-431a-96c6-c756f47f8270"
+}
 return
-
 
 ButtonПомощь:
 HelpString =
@@ -257,9 +283,7 @@ return
 } ; Конец GUI
 
 
-
-
-{ ; HOTKEYS start
+{ ; LOCAL HOTKEYS
 
 :?:/я::
 SendInput % A_DD "." A_Mon A_Space username
@@ -288,7 +312,7 @@ If (MARKETPLACE != "OZON") and MPTEST[4] and RegexMatch(MPTEST[1], "\d+-\d{4}-\d
 	Gui, Destroy
 	MARKETPLACE := "OZON"
 	Gui, Add, Text,, OZON Магазин:
-	Gui, Add, DropDownList, w80 x+1 vSHOP_ID gSHOP_ID, UEPlenka|Защита V10|ОБА|Оптовая база|Премиум|Просто надо|Просто надо покупать|НК
+	Gui, Add, DropDownList, w100 x+1 vSHOP_ID gSHOP_ID, UEPlenka|Защита V10|ОБА|Оптовая база|Премиум|Просто надо|Просто надо покупать|НК
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Артикул|Количество|Название
 }
@@ -298,7 +322,7 @@ If (MARKETPLACE != "YANDEX") and MPTEST[4] and RegexMatch(MPTEST[1], "[0-9]{9}")
 	Gui, Destroy
 	MARKETPLACE := "YANDEX"
 	Gui, Add, Text,, YANDEX Магазин:
-	Gui, Add, DropDownList, w80 x+1 vSHOP_ID gSHOP_ID, Броня|Премиум|УЕАксы|УЕПленка
+	Gui, Add, DropDownList, w100 x+1 vSHOP_ID gSHOP_ID, Броня|Премиум|УЕАксы|УЕПленка
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Название|Артикул|Количество
 }
@@ -308,7 +332,7 @@ If !MPTEST[4] and (MARKETPLACE != "WB") 										; Если ВБ
 	Gui, Destroy
 	MARKETPLACE := "WB"	
 	Gui, Add, Text,, WB ИП:
-	Gui, Add, DropDownList, w50 x+1 vSHOP_ID gSHOP_ID, 1|2|3|4
+	Gui, Add, DropDownList, w70 x+1 vSHOP_ID gSHOP_ID, 1|2|3|4
 	Gui, Add, Button, x+3 vMoveOrders, Переместить
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Название|Артикул|Этикетка
@@ -332,33 +356,9 @@ If ChangeMP
 SendInput {Alt up}
 return
 
-!1::
-sleep 100
-Result1 :=
+#Include Local.ahk
 
-If (MARKETPLACE == "OZON")
-	Ozon1()
-
-If (MARKETPLACE == "WB")
-	WB1()
-
-If (MARKETPLACE == "YANDEX")
-	YANDEX1()
-SendInput {Alt up}
-return
-
-!2::
-sleep 100
-If (MARKETPLACE == "WB")
-	return
-SendInput {Alt up}
-return
-
-!3::
-NextOrder()
-return
-
-} ; HOTKEYS finish
+}
 
 { ; Заказы 
 { ; ========================================================= OZON
@@ -371,18 +371,17 @@ If !APIKEY
 }
 WinActivate, ahk_exe chrome.exe
 WinActivate, ahk_exe browser.exe
-
+sleep 100
 loop 10 ; Чистка вкладок
 {
 	WinGetActiveTitle, Title
-	If InStr(Title, "в интернет-магазине OZON") or If InStr(Title, ".pdf") or If InStr(Title, "ticket-")
+	If InStr(Title, "в интернет-магазине OZON") or InStr(Title, ".pdf") 
 	{
 		SendInput ^{vk57}		 ; ctrl+W
 		SendInput ^{PgUp}		 ; Предыдущая вкладка
 		sleep 100
 	}
 }
-sleep 100
 
 NextOrder()
 If (Current_Line > LV_GetCount())
@@ -406,7 +405,7 @@ If InStr(Title, "posting-label-") or InStr(Title, ".pdf")
 	sleep 800
 	break
 	}
-sleep 200
+	sleep 200
 }
 
 O_PIC(OrderNumber)
@@ -534,6 +533,7 @@ WB1()
 		return
 	}
 	LV_GetText(OrderNumber, Current_Line, 1)
+	
 	W_LAB(OrderNumber, False) ; Этикетка
 	
 	If FileExist("temp.bmp") ; Если получилось загрузить этикетку
@@ -554,12 +554,7 @@ WB1()
 		}
 		W_PIC(OrderNumber) ; Креатив
 	}
-	Else  ; Если нет этикетки
-	{
-		MsgBox, Не удалось загрузить этикетку - проверьте подключение к интернету и статус заказа
-		LV_Modify(Current_Line, "-Check")
-		return
-	}
+
 
 } ; WB1
 
@@ -622,26 +617,25 @@ AmountCheck(Current_Number) ; Проверка количества
 
 { ; OZON API
 
-
 O_LAB(OrderID, p := False) ; Получить номер задания для создания этикетки
 {
-    body := {"posting_number": [OrderID]} ; this is now an ahk object
+	body := {"posting_number": [OrderID]} ; this is now an ahk object
 	WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-    WebRequest.Open("POST", "https://api-seller.ozon.ru/v1/posting/fbs/package-label/create")
-    WebRequest.SetRequestHeader("Content-Type", "application/json")
-    WebRequest.setRequestHeader("Accept", "application/json")
+	WebRequest.Open("POST", "https://api-seller.ozon.ru/v1/posting/fbs/package-label/create")
+	WebRequest.SetRequestHeader("Content-Type", "application/json")
+	WebRequest.setRequestHeader("Accept", "application/json")
 	WebRequest.setRequestHeader("Client-Id", CLIENTID)
-    WebRequest.SetRequestHeader("Api-Key", APIKEY)
+	WebRequest.SetRequestHeader("Api-Key", APIKEY)
 	WebRequest.Send(JSON.Dump(body))
 
-    httpStatus := WebRequest.Status
-    Arr := WebRequest.responseBody
-    pData := NumGet(ComObjValue(Arr) + 8 + A_PtrSize)
-    length := Arr.MaxIndex() + 1
-    response := StrGet(pData, length, "UTF-8")
+	httpStatus := WebRequest.Status
+	Arr := WebRequest.responseBody
+	pData := NumGet(ComObjValue(Arr) + 8 + A_PtrSize)
+	length := Arr.MaxIndex() + 1
+	response := StrGet(pData, length, "UTF-8")
 
-    Result := {"result": p ? JSON.Load(response) : response, "status": httpStatus}
-    Append := % Result["result"]
+	Result := {"result": p ? JSON.Load(response) : response, "status": httpStatus}
+	Append := % Result["result"]
 	RegexMatch(Append, "task_id"":(.*)}}", task_id)
 	return task_id1
 }
@@ -649,48 +643,60 @@ O_LAB(OrderID, p := False) ; Получить номер задания для �
 O_LAB2(OrderID, p := False) ; Открыть этикетку
 {
 	sleep 300
-    body := {"task_id": OrderID} ; this is now an ahk object
+	body := {"task_id": OrderID} ; this is now an ahk object
 	WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-    WebRequest.Open("POST", "https://api-seller.ozon.ru/v1/posting/fbs/package-label/get")
-    WebRequest.SetRequestHeader("Content-Type", "application/json")
-    WebRequest.setRequestHeader("Accept", "application/json")
+	WebRequest.Open("POST", "https://api-seller.ozon.ru/v1/posting/fbs/package-label/get")
+	WebRequest.SetRequestHeader("Content-Type", "application/json")
+	WebRequest.setRequestHeader("Accept", "application/json")
 	WebRequest.setRequestHeader("Client-Id", CLIENTID)
-    WebRequest.SetRequestHeader("Api-Key", APIKEY)
+	WebRequest.SetRequestHeader("Api-Key", APIKEY)
 	WebRequest.Send(JSON.Dump(body))
 
-    httpStatus := WebRequest.Status
-    Arr := WebRequest.responseBody
-    pData := NumGet(ComObjValue(Arr) + 8 + A_PtrSize)
-    length := Arr.MaxIndex() + 1
-    response := StrGet(pData, length, "UTF-8")
+	httpStatus := WebRequest.Status
+	Arr := WebRequest.responseBody
+	pData := NumGet(ComObjValue(Arr) + 8 + A_PtrSize)
+	length := Arr.MaxIndex() + 1
+	response := StrGet(pData, length, "UTF-8")
 
-    Result := {"result": p ? JSON.Load(response) : response, "status": httpStatus}
-    Append := % Result["result"]
+	Result := {"result": p ? JSON.Load(response) : response, "status": httpStatus}
+	Append := % Result["result"]
 	RegexMatch(Append, "file_url"":""(.*)""}}", label_url)
-	Run, % label_url1
+	If label_url1
+		Run, % label_url1
+	else
+	{
+		MsgBox, 262144, Ошибка, Не удалось скачать этикетку.
+		LV_Modify(Current_Line, "-Check")
+	}
 }
 
 
 O_PIC(OrderID, p := False) ; Получить информацию о заказе
 {
-    body := {"posting_number":OrderID}
+	body := {"posting_number":OrderID}
 	WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-    WebRequest.Open("POST", "https://api-seller.ozon.ru/v3/posting/fbs/get")
-    WebRequest.SetRequestHeader("Content-Type", "application/json")
-    WebRequest.setRequestHeader("Accept", "application/json")
+	WebRequest.Open("POST", "https://api-seller.ozon.ru/v3/posting/fbs/get")
+	WebRequest.SetRequestHeader("Content-Type", "application/json")
+	WebRequest.setRequestHeader("Accept", "application/json")
 	WebRequest.setRequestHeader("Client-Id", CLIENTID)
-    WebRequest.SetRequestHeader("Api-Key", APIKEY)
+	WebRequest.SetRequestHeader("Api-Key", APIKEY)
 	WebRequest.Send(JSON.Dump(body))
-    httpStatus := WebRequest.Status
-    Arr := WebRequest.responseBody
-    pData := NumGet(ComObjValue(Arr) + 8 + A_PtrSize)
-    length := Arr.MaxIndex() + 1
-    response := StrGet(pData, length, "UTF-8")
+	httpStatus := WebRequest.Status
+	Arr := WebRequest.responseBody
+	pData := NumGet(ComObjValue(Arr) + 8 + A_PtrSize)
+	length := Arr.MaxIndex() + 1
+	response := StrGet(pData, length, "UTF-8")
 
-    Result := {"result": p ? JSON.Load(response) : response, "status": httpStatus}
-    Append := % Result["result"]
-	RegexMatch(Append, "U)sku"":(.*)`,""", picture_url)
-	Run, % "https://www.ozon.ru/context/detail/id/" picture_url1
+	Result := {"result": p ? JSON.Load(response) : response, "status": httpStatus}
+	Append := % Result["result"]
+	RegexMatch(Append, "U)sku"":(.*)`,", picture_url)
+	If picture_url1
+		Run, % "https://www.ozon.ru/context/detail/id/" picture_url1
+	else
+	{
+		MsgBox, 262144, Ошибка, Не удалось открыть изображение товара.
+		LV_Modify(Current_Line, "-Check")
+	}
 }
 
 } ; /OZON API
@@ -735,15 +741,15 @@ W_LAB(OrderID, p := False) ; ################# Этикетка
 {
 	OrderID += 0
 	FileDelete, temp.bmp
-    body := {"orders": [OrderID]} ; this is now an ahk object
-    WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-    WebRequest.Open("POST", "https://suppliers-api.wildberries.ru/api/v3/orders/stickers?type=png&width=58&height=40")
-    WebRequest.SetRequestHeader("Content-Type", "application/json")
-    WebRequest.setRequestHeader("Accept", "application/json")
-    WebRequest.SetRequestHeader("Authorization", APIKEY)
-    WebRequest.Send(JSON.Dump(body))
+	body := {"orders": [OrderID]} ; this is now an ahk object
+	WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+	WebRequest.Open("POST", "https://suppliers-api.wildberries.ru/api/v3/orders/stickers?type=png&width=58&height=40")
+	WebRequest.SetRequestHeader("Content-Type", "application/json")
+	WebRequest.setRequestHeader("Accept", "application/json")
+	WebRequest.SetRequestHeader("Authorization", APIKEY)
+	WebRequest.Send(JSON.Dump(body))
 
-    httpStatus := WebRequest.Status
+	httpStatus := WebRequest.Status
 	
 	If WebRequest.responseBody
 	{
@@ -756,7 +762,13 @@ W_LAB(OrderID, p := False) ; ################# Этикетка
 		Append := % Result["result"]
 		If RegexMatch(Append, "file"":""(.*)"",""orderId", WBimg)
 			Decode(WBimg1)
-		Run, temp.bmp
+		try
+			Run, temp.bmp
+		catch
+		{
+			MsgBox, 262144, Ошибка, Не удалось открыть этикетку.
+			LV_Modify(Current_Line, "-Check")
+		}
 	}
 }
 
@@ -809,7 +821,7 @@ If WinActive("ahk_exe chrome.exe") or WinActive("ahk_exe browser.exe")
 		CopyALI()
 		Sorting(2)
 	}
-	If InStr(Clipboard, "2023") and InStr(Clipboard, "Арт.:")
+	If InStr(Clipboard, "2023") and InStr(Clipboard, "Арт.")
 	{
 		global MARKETPLACE_COPY := "WB"
 		CopyWB()
@@ -979,7 +991,7 @@ CopyWB() ; WB
 {
 	Loop, parse, clipboard, `n, `r
 	{
-		If RegexMatch(A_LoopField, "Арт.: (.*)", Result)
+		If RegexMatch(A_LoopField, "Арт. (.*)", Result)
 		{
 			Resultstring := Resultstring OldString A_Tab Result1 "`n"
 		}
