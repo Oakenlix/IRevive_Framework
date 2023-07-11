@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.1
+Script_Version := 1.2
 
 Center_X := A_ScreenWidth/2
 Center_Y := A_ScreenHeight/2
@@ -137,8 +137,10 @@ ExitFunc()
 	size_y -= 29
 	IniWrite, x%gui_x% y%gui_y% w%size_x% h%size_y%, Settings.ini, window position, gui_position
 }
+
 ButtonВыйти:
 GuiClose:  ; When the window is closed.
+ExitFunc()
 ExitApp
 
 ButtonСохранить:
@@ -372,15 +374,15 @@ If !APIKEY
 WinActivate, ahk_exe chrome.exe
 WinActivate, ahk_exe browser.exe
 sleep 100
-loop 10 ; Чистка вкладок
+loop 10 
 {
 	WinGetActiveTitle, Title
-	If InStr(Title, "в интернет-магазине OZON") or InStr(Title, ".pdf") 
+	If InStr(Title, "в интернет-магазине OZON") or InStr(Title, ".pdf")
 	{
-		SendInput ^{vk57}		 ; ctrl+W
-		SendInput ^{PgUp}		 ; Предыдущая вкладка
-		sleep 100
+		SendInput ^{vk57} ; CTRL+W Закрыть вкладку
 	}
+	else break
+	sleep 150
 }
 
 NextOrder()
@@ -515,6 +517,7 @@ WB1()
 	}
 	WinActivate, ahk_exe chrome.exe
 	WinActivate, ahk_exe browser.exe
+	sleep 100
 	loop 10 
 	{
 		WinGetActiveTitle, Title
@@ -642,7 +645,7 @@ O_LAB(OrderID, p := False) ; Получить номер задания для �
 
 O_LAB2(OrderID, p := False) ; Открыть этикетку
 {
-	sleep 300
+	sleep 400
 	body := {"task_id": OrderID} ; this is now an ahk object
 	WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
 	WebRequest.Open("POST", "https://api-seller.ozon.ru/v1/posting/fbs/package-label/get")
