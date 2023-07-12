@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.2
+Script_Version := 1.3
 
 Center_X := A_ScreenWidth/2
 Center_Y := A_ScreenHeight/2
@@ -52,36 +52,22 @@ If !FileExist("Settings.ini")
 	IniWrite, 0, Settings.ini, user, setontop
 	IniWrite, w400 h200, Settings.ini, window position, gui_position
 
-	IniWrite, 0, Settings.ini, Ozon, O_Galochka
-	IniWrite, 0, Settings.ini, Ozon, O_Etiketka
-	IniWrite, 0, Settings.ini, Ozon, O_Poisk
-
 	IniWrite, 0, Settings.ini, Yandex, Y_Poisk
 	IniWrite, 0, Settings.ini, Yandex, Y_Zakaz
 	IniWrite, 0, Settings.ini, Yandex, Y_Kartinka
 	IniWrite, 0, Settings.ini, Yandex, Y_Etiketka
-
-	IniWrite, 0, Settings.ini, WB, W_Galochka
-	IniWrite, 0, Settings.ini, WB, W_Etiketka
 }
 
 IniRead, username, Settings.ini, user, name, Имя
-IniRead, username, Settings.ini, user, name
+IniRead, department, Settings.ini, user, department
+IniRead, enablefilter, Settings.ini, user, enablefilter
 IniRead, setontop, Settings.ini, user, setontop
 IniRead, gui_position, Settings.ini, window position, gui_position, w400 h200
-
-IniRead, O_Galochka, Settings.ini, Ozon, O_Galochka
-IniRead, O_Etiketka, Settings.ini, Ozon, O_Etiketka
-IniRead, O_Poisk, Settings.ini, Ozon, O_Poisk
 
 IniRead, Y_Poisk, Settings.ini, Yandex, Y_Poisk
 IniRead, Y_Zakaz, Settings.ini, Yandex, Y_Zakaz
 IniRead, Y_Kartinka, Settings.ini, Yandex, Y_Kartinka
 IniRead, Y_Etiketka, Settings.ini, Yandex, Y_Etiketka
-
-IniRead, W_Galochka, Settings.ini, WB, W_Galochka
-IniRead, W_Etiketka, Settings.ini, WB, W_Etiketka
-
 
 LoadMainGUI()
 return
@@ -90,9 +76,18 @@ LoadMainGUI()
 {
 	global
 	Gui, Add, Button,, Помощь
-	Gui, Add, Text, xs y+20, Настройки
+	Gui, Add, Text, xs y+15, Настройки
 	Gui, Add, Text, xs, Имя:
-	Gui, Add, Edit, w100 x+5 vUSERNAME, % username
+	Gui, Add, Edit, w100 x+3 vUSERNAME, % username
+	Gui, Add, Text, x+3, Отдел:
+	Gui, Add, DropDownList, w100 x+3 vDEPARTMENT, Аксы/Пленка|Сувенирка|УФ печать
+	If (DEPARTMENT == "Аксы/Пленка")
+		GuiControl,, DEPARTMENT, |Аксы/Пленка||Сувенирка|УФ печать|
+	If (DEPARTMENT == "Сувенирка")
+		GuiControl,, DEPARTMENT, |Аксы/Пленка|Сувенирка||УФ печать|
+	If (DEPARTMENT == "УФ печать")
+		GuiControl,, DEPARTMENT, |Аксы/Пленка|Сувенирка|УФ печать||
+	Gui, Add, CheckBox, xs vEnableFilter Checked%EnableFilter%, Фильтровать заказы по отделу
 	Gui, Add, CheckBox, xs vSetontop Checked%setontop%, Отображать поверх других окон
 	Gui, Add, Button, xs default, Сохранить  ; СОХРАНИТЬ НАСТРОЙКИ
 	Gui, Add, Button, x+5, Выйти  ; выход
@@ -146,6 +141,8 @@ ExitApp
 ButtonСохранить:
 Gui, Submit, NoHide 
 IniWrite, %username%, Settings.ini, user, name
+IniWrite, %department%, Settings.ini, user, department
+IniWrite, %enablefilter%, Settings.ini, user, enablefilter
 IniWrite, %setontop%, Settings.ini, user, setontop
 If SETONTOP
 	WinSet, AlwaysOnTop, On, %A_ScriptName%
@@ -203,6 +200,7 @@ If supplyId
 }
 return
 
+{ ; API ключи
 SHOP_ID:
 global APIKEY :=
 global CLIENTID :=
@@ -215,10 +213,61 @@ If (SHOP_ID == 3)
 	APIKEY := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6IjJjNjRjOWY4LThhMWEtNDIwNC1hZmRlLTVkMzJlN2YyZmYzOCJ9.9YJFt2BdOz7qJNK67Fh2249q_SEtVyvgXG_IAE3Roow"
 If (SHOP_ID == 4)
 	APIKEY := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6IjQxYmUxZmY4LTVjNmEtNGE4NC04Njk3LTA1OTM0MGU3NmI2MiJ9.Lv5x5ZVm2MMczZbpHgJbIRJmfDScOrkLsHMD2NUgUHY"
+
+If (SHOP_ID == "PNP")
+{
+	CLIENTID := 903407
+	APIKEY := "9aeee326-c07f-4225-b539-2dfc5416ffba"
+}
+If (SHOP_ID == "PNP - NARD")
+{
+	CLIENTID := 1232668
+	APIKEY := "ec316a38-4276-44ac-92ae-018e64d6f3bf"
+}
+If (SHOP_ID == "PNP - PUZZLE")
+{
+	CLIENTID := 1232684
+	APIKEY := "41874a00-1aac-4e4e-a654-fd1e2d7725b8"
+}
+If (SHOP_ID == "PNPColor")
+{
+	CLIENTID := 903361
+	APIKEY := "fc02109d-8ab2-4e74-b829-0b717b1013f3"
+}
+If (SHOP_ID == "PNPGROUPP")
+{
+	CLIENTID := 1198650 
+	APIKEY := "a2782187-02f1-40e5-977a-bea9f2d63292"
+}
+If (SHOP_ID == "PNPMetall")
+{
+	CLIENTID := 903510
+	APIKEY := "344a7f91-34a3-4dcf-99fa-e4f26be8499d"
+}
+If (SHOP_ID == "UEGrafic")
+{
+	CLIENTID := 509070
+	APIKEY := "e328158c-2726-4e31-93f8-bc5e1f622b49"
+}
 If (SHOP_ID == "UEPlenka")
 {
 	CLIENTID := 563560
 	APIKEY := "8d5da2ed-df09-424d-b48f-f1800c75d39d"
+}
+If (SHOP_ID == "UFpnpColor")
+{
+	CLIENTID := 903485
+	APIKEY := "077e6023-caed-4177-a0c4-0c9ce3f6f34a"
+}
+If (SHOP_ID == "WBW")
+{
+	CLIENTID := 1232719
+	APIKEY := "f44029ff-c1f5-4749-9358-8c72be515522"
+}
+If (SHOP_ID == "Woodcutty")
+{
+	CLIENTID := 1147890
+	APIKEY := "397d932e-c797-47b5-8b49-dda27f2a3f5d"
 }
 If (SHOP_ID == "Защита V10")
 {
@@ -230,12 +279,22 @@ If (SHOP_ID == "ОБА")
 	CLIENTID := 128494
 	APIKEY := "c6c2235a-289c-48b6-90c1-1a06dfb37ce1"
 }
-If (SHOP_ID == "Оптовая база")
+If (SHOP_ID == "Оптовая база аксессуаров")
 {
 	CLIENTID := 266046
 	APIKEY := "7b6879f1-1458-4a37-8c9b-3a5b978dafe8"
 }
-If (SHOP_ID == "Премиум")
+If (SHOP_ID == "ПНП-Групп")
+{
+	CLIENTID := 1138751
+	APIKEY := "d6913044-2e5d-4ebc-bcb4-b12ae183ee6f"
+}
+If (SHOP_ID == "Подарок со смыслом")
+{
+	CLIENTID := 903384
+	APIKEY := "7a426e1f-80df-46a4-be18-885a449fa3eb"
+}
+If (SHOP_ID == "Премиум Защита")
 {
 	CLIENTID := 440833
 	APIKEY := "5efa14da-100f-477f-8e37-5b69ab4605e0"
@@ -250,12 +309,23 @@ If (SHOP_ID == "Просто надо покупать")
 	CLIENTID := 718802
 	APIKEY := "63b81af9-3d65-44d9-aec8-88b72c7acec8"
 }
-If (SHOP_ID == "НК")
+If (SHOP_ID == "Просто надо померить")
+{
+	CLIENTID := 718880
+	APIKEY := "1e441808-c929-466d-8894-64b7cf86504d"
+}
+If (SHOP_ID == "Родионова Е. Ю.")
+{
+	CLIENTID := 718870
+	APIKEY := "2b7fc54e-7f33-4b94-90c4-2ad95b5aaf63"
+}
+If (SHOP_ID == "Родионова Н. К.")
 {
 	CLIENTID := 563357
 	APIKEY := "33dabb9c-65c9-431a-96c6-c756f47f8270"
 }
 return
+} ; /API ключи
 
 ButtonПомощь:
 HelpString =
@@ -302,9 +372,14 @@ return
 
 !0::
 ChangeMP := 0
+If !Department or Department == "ERROR"
+{
+	MsgBox, 262144, Ошибка, Выберите свой отдел в настройках
+	return
+}
 global Current_Line := 1
 SendInput ^{vk43} ; Ctrl C
-sleep 200 ; Нужно для загрузки буфера
+sleep 300 ; Нужно для загрузки буфера
 OrderLine := StrSplit(clipboard, "`n", "`r")
 MPTEST := StrSplit(OrderLine[1], A_Tab) ; Проверяем маркетплейс по первой строке
 ExitFunc() ; Запоминаем положение окна
@@ -314,7 +389,12 @@ If (MARKETPLACE != "OZON") and MPTEST[4] and RegexMatch(MPTEST[1], "\d+-\d{4}-\d
 	Gui, Destroy
 	MARKETPLACE := "OZON"
 	Gui, Add, Text,, OZON Магазин:
-	Gui, Add, DropDownList, w100 x+1 vSHOP_ID gSHOP_ID, UEPlenka|Защита V10|ОБА|Оптовая база|Премиум|Просто надо|Просто надо покупать|НК
+	If (DEPARTMENT == "Аксы/Пленка")
+		Gui, Add, DropDownList, w110 x+1 vSHOP_ID gSHOP_ID, UEPlenka|Защита V10|ОБА|Оптовая база аксессуаров|Премиум Защита|Просто надо|Просто надо покупать|Родионова Н. К.
+	If (DEPARTMENT == "Сувенирка")
+		Gui, Add, DropDownList, w110 x+1 vSHOP_ID gSHOP_ID, PNP|PNPGROUPP|PNPMetall|UEGrafic|ПНП-Групп|Просто надо|Родионова Е. Ю.|Родионова Н. К.
+	If (DEPARTMENT == "УФ печать")
+		Gui, Add, DropDownList, w110 x+1 vSHOP_ID gSHOP_ID, PNPColor|UFpnpColor
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Артикул|Количество|Название
 }
@@ -324,7 +404,12 @@ If (MARKETPLACE != "YANDEX") and MPTEST[4] and RegexMatch(MPTEST[1], "[0-9]{9}")
 	Gui, Destroy
 	MARKETPLACE := "YANDEX"
 	Gui, Add, Text,, YANDEX Магазин:
-	Gui, Add, DropDownList, w100 x+1 vSHOP_ID gSHOP_ID, Броня|Премиум|УЕАксы|УЕПленка
+	If (DEPARTMENT == "Аксы/Пленка")
+		Gui, Add, DropDownList, w100 x+1 vSHOP_ID gSHOP_ID, Броня|Премиум|УЕАксы|УЕПленка
+	If (DEPARTMENT == "Сувенирка")
+		Gui, Add, DropDownList, w110 x+1 vSHOP_ID gSHOP_ID, IRevive|UEGrafic|UEbrelki
+	If (DEPARTMENT == "УФ печать")
+		Gui, Add, DropDownList, w110 x+1 vSHOP_ID gSHOP_ID, IRevive|UEGrafic|UEbrelki
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Название|Артикул|Количество
 }
@@ -806,9 +891,10 @@ Return Rqd
 OnClipboardChange:
 If WinActive("ahk_exe chrome.exe") or WinActive("ahk_exe browser.exe")
 {
+	MARKETPLACE_COPY :=
 	If RegexMatch(Clipboard, "\d+-\d{4}-\d", Result) and InStr(Clipboard, "шт.")
 	{
-		global MARKETPLACE_COPY:= "OZON"
+		global MARKETPLACE_COPY := "OZON"
 		CopyOzon()
 		Sorting(4)
 	}
@@ -830,9 +916,62 @@ If WinActive("ahk_exe chrome.exe") or WinActive("ahk_exe browser.exe")
 		CopyWB()
 		Sorting(2)
 	}
+	
+	If MARKETPLACE_COPY and EnableFilter
+	{
+		If (Department == "Аксы/Пленка") ; Фильтруем пленку и аксы
+			FilterPlenka()
+		If (Department == "Сувенирка") ; Фильтруем сувенирку
+			FilterSuvenirka()
+	}
+		
 }
 return
 
+FilterPlenka()
+{
+	Loop, parse, Clipboard, `n, `r
+	{
+		If !InStr(A_LoopField, "Брел") 
+		and !InStr(A_LoopField, "Брасл") 
+		and !InStr(A_LoopField, "Жетон")
+		and !InStr(A_LoopField, "Зажигалк") 
+		and !InStr(A_LoopField, "Подвес") 
+		and !InStr(A_LoopField, "Кулон") 
+		and !InStr(A_LoopField, "Адресник")  
+		and !InStr(A_LoopField, "уф печ") 
+		and !InStr(A_LoopField, "наклейка")
+		and !InStr(A_LoopField, "панно")
+		and !InStr(A_LoopField, "декор")
+		and !InStr(A_LoopField, "подставка под горяч")
+		or InStr(A_LoopField, "Band") and !InStr(A_LoopField, "Брел")
+			Resultstring := Resultstring A_LoopField "`n"
+	}
+If RegexMatch(Resultstring, "\w", result)
+	Clipboard := Resultstring
+else 
+	MsgBox Не найдено
+}
+
+FilterSuvenirka()
+{
+	Loop, parse, Clipboard, `n, `r
+	{
+		If InStr(A_LoopField, "Брел")
+		or InStr(A_LoopField, "Жетон")
+		or InStr(A_LoopField, "Подвес")
+		or InStr(A_LoopField, "Кулон") 
+		or InStr(A_LoopField, "Зажигалк") 
+		or InStr(A_LoopField, "Ручк") 
+		or InStr(A_LoopField, "Брасл") and !InStr(A_LoopField, "Band")
+			Resultstring := Resultstring A_LoopField "`n"
+	}
+	Clipboard := Resultstring
+	If RegexMatch(Resultstring, "\w", result)
+		Clipboard := Resultstring
+	else 
+		MsgBox Не найдено
+}
 
 Sorting(WhereIsName)
 {
@@ -847,30 +986,18 @@ Loop, parse, clipboard, `n, `r
 			TheOrderName := SubStr(TheOrderName, Pos)
 			}
 		
-		If InStr(TheOrderName, " час") ;============== Ищем часы
-			and !InStr(TheOrderName, "Band")
+		
+		If (InStr(TheOrderName, " час") ;============== Ищем часы
+		or InStr(TheOrderName, "-час") 
+		or InStr(TheOrderName, "watch"))
+			and (!InStr(TheOrderName, "Band")
 			and !InStr(TheOrderName, "зарядк")
 			and !InStr(TheOrderName, "зарядк")
 			and !InStr(TheOrderName, "стекло")
 			and !InStr(TheOrderName, "чехол")
-			and !InStr(TheOrderName, "не пленка")
-		or InStr(TheOrderName, "-час")
-			and !InStr(TheOrderName, "Band")
-			and !InStr(TheOrderName, "зарядк")
-			and !InStr(TheOrderName, "зарядк")
-			and !InStr(TheOrderName, "стекло")
-			and !InStr(TheOrderName, "чехол")
-			and !InStr(TheOrderName, "не пленка")
-		or InStr(TheOrderName, "watch")
-			and !InStr(TheOrderName, "Band")
-			and !InStr(TheOrderName, "зарядк")
-			and !InStr(TheOrderName, "зарядк")
-			and !InStr(TheOrderName, "стекло")
-			and !InStr(TheOrderName, "чехол")
-			and !InStr(TheOrderName, "не пленка")
-		or InStr(TheOrderName, "watch")
-			and InStr(TheOrderName, "не стекло")
-		or InStr(TheOrderName, "час")
+			and !InStr(TheOrderName, "не пленка"))
+		or (InStr(TheOrderName, "watch")
+		or InStr(TheOrderName, "час"))
 			and InStr(TheOrderName, "не стекло")
 		or InStr(TheOrderName, "Elari")
 		or InStr(TheOrderName, "Polar")
