@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.6
+Script_Version := 1.7
 
 Center_X := A_ScreenWidth/2
 Center_Y := A_ScreenHeight/2
@@ -431,6 +431,9 @@ If !MPTEST[4] and (MARKETPLACE != "WB") 										; Если ВБ
 	LV_ModifyCol(2, 200)
 	LV_ModifyCol(4, 50)
 }
+else
+	LoadTable()
+
 If ChangeMP
 	SpawnGUI()
 return
