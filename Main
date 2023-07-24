@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.5
+Script_Version := 1.6
 
 Center_X := A_ScreenWidth/2
 Center_Y := A_ScreenHeight/2
@@ -394,6 +394,9 @@ If (MARKETPLACE != "OZON") and MPTEST[4] and RegexMatch(MPTEST[1], "\d+-\d{4}-\d
 		Gui, Add, DropDownList, w110 x+1 vSHOP_ID gSHOP_ID, PNPColor|UFpnpColor
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Артикул|Количество|Название
+	LoadTable()
+	LV_ModifyCol()
+	LV_ModifyCol(4, 200)
 }
 If (MARKETPLACE != "YANDEX") and MPTEST[4] and RegexMatch(MPTEST[1], "[0-9]{9}") and !InStr(MPTEST[1], "-") ; Если ЯНДЕКС
 {
@@ -409,6 +412,9 @@ If (MARKETPLACE != "YANDEX") and MPTEST[4] and RegexMatch(MPTEST[1], "[0-9]{9}")
 		Gui, Add, DropDownList, w110 x+1 vSHOP_ID gSHOP_ID, IRevive|UEGrafic|UEbrelki
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Название|Артикул|Количество
+	LoadTable()
+	LV_ModifyCol()
+	LV_ModifyCol(2, 200)
 }
 If !MPTEST[4] and (MARKETPLACE != "WB") 										; Если ВБ
 {
@@ -420,24 +426,28 @@ If !MPTEST[4] and (MARKETPLACE != "WB") 										; Если ВБ
 	Gui, Add, Button, x+3 vMoveOrders, Переместить
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Название|Артикул|Этикетка
-	
+	LoadTable()
+	LV_ModifyCol()
+	LV_ModifyCol(2, 200)
+	LV_ModifyCol(4, 50)
 }
-GuiControl, -Redraw, MyTable ; ДОБАВЛЕНИЕ ТАБЛИЦЫ В LISTVIEW
-LV_Delete()
-loop % OrderLine.MaxIndex()
-	{
-	OrderPart := StrSplit(OrderLine[A_Index], A_Tab)
-	If OrderLine[A_Index]
-		LV_Add("", OrderPart[1], OrderPart[2], OrderPart[3], OrderPart[4])
-	}
-GuiControl, +Redraw, MyTable
-
-LV_ModifyCol()
-LV_ModifyCol(2, Sort)
-
 If ChangeMP
 	SpawnGUI()
 return
+
+LoadTable() ; ДОБАВЛЕНИЕ ТАБЛИЦЫ В LISTVIEW
+{
+	global
+	GuiControl, -Redraw, MyTable 
+	LV_Delete()
+	loop % OrderLine.MaxIndex()
+	{
+		OrderPart := StrSplit(OrderLine[A_Index], A_Tab)
+		If OrderLine[A_Index]
+			LV_Add("", OrderPart[1], OrderPart[2], OrderPart[3], OrderPart[4])
+	}
+	GuiControl, +Redraw, MyTable
+}
 
 ; ############################################################ LOCAL HOTKEYS
 
@@ -1319,8 +1329,11 @@ W_LAB(OrderID, p := False) ; ################# Этикетка
 		response := StrGet(pData, length, "UTF-8")
 		Result := {"result": p ? JSON.Load(response) : response, "status": httpStatus}
 		Append := % Result["result"]
-		If RegexMatch(Append, "file"":""(.*)"",""orderId", WBimg)
-			Decode(WBimg1)
+		If RegexMatch(Append, "U)partA"":""(.*)"",""partB"":""(.*)"",.*file"":""(.*)"",""orderId", WBimg)
+		{
+			LV_Modify(Current_Line,,,,, WBimg2 A_Space WBimg1)
+			Decode(WBimg3)
+		}
 		If FileExist("temp.bmp")
 			Run, temp.bmp
 		return true
