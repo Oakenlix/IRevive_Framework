@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.4
+Script_Version := 1.5
 
 Center_X := A_ScreenWidth/2
 Center_Y := A_ScreenHeight/2
@@ -66,6 +66,8 @@ IniRead, Y_Kartinka, Settings.ini, Yandex, Y_Kartinka
 IniRead, Y_Etiketka, Settings.ini, Yandex, Y_Etiketka
 
 LoadMainGUI()
+If LaunchMinimized and (LaunchMinimized != "Error") ; Сразу свернуть, если выбрана эта опция
+		WinMinimize, %A_ScriptName%
 return
 
 LoadMainGUI()
@@ -92,8 +94,6 @@ SpawnGUI()
 	Gui +Resize
 	If SetOnTop and (SetOnTop != "Error")
 		WinSet, AlwaysOnTop, On, %A_ScriptName%
-	If LaunchMinimized and (LaunchMinimized != "Error")
-		WinMinimize, %A_ScriptName%
 }
 
 } ; СТАРТ
@@ -447,6 +447,25 @@ return
 KeyWait, Lalt
 sleep 100
 Result1 :=
+If (MARKETPLACE == "OZON")
+	Ozon1()
+If (MARKETPLACE == "WB")
+	WB1()
+If (MARKETPLACE == "YANDEX")
+	YANDEX1()
+return
+} ; /Аксы/Пленка
+
+#If (DEPARTMENT == "Сувенирка")
+{
+TemplatesGuiClose:
+Gui, Templates:destroy
+return
+
+!1::
+KeyWait, Lalt
+sleep 100
+Result1 :=
 
 If (MARKETPLACE == "OZON")
 	Ozon1()
@@ -456,13 +475,6 @@ If (MARKETPLACE == "WB")
 
 If (MARKETPLACE == "YANDEX")
 	YANDEX1()
-return
-} ; /Аксы/Пленка
-
-#If (DEPARTMENT == "Сувенирка")
-{
-2GuiClose:
-Gui, Templates:destroy
 return
 
 #If (DEPARTMENT == "Сувенирка") and WinActive("EzCad") 
@@ -484,7 +496,7 @@ Gui, Templates:Add, Edit, w60 x+3 vBrelok_Amount
 Gui, Templates:Add, Button, xs gMassplacement default, OK  ; OK
 Gui, Templates:Show, w200 h100
 WinSet, AlwaysOnTop, On, %A_ScriptName%
-GuiControl, Focus, Brelok_Amount
+GuiControl, Templates:Focus, Brelok_Amount
 return
 
 Massplacement:
@@ -575,7 +587,7 @@ return
 
 PrintALL(Coord_X, Coord_Y, SizeX, SizeY) ; альт+2
 {
-Click, 80 510
+Click, 80 515
 sleep 100
 Sendinput {bs 10}
 sleep 50
@@ -779,7 +791,7 @@ return
 
 Print(Coord_X, Coord_Y) ; Жетоны
 {
-Click, 80 510
+Click, 80 515
 sleep 100
 Sendinput {bs 10}
 sleep 50
@@ -800,7 +812,7 @@ Click, 1775 280
 
 Print2(Coord_X, Coord_Y) ; Плашки
 {
-Click, 80 510
+Click, 80 515
 sleep 200
 Sendinput {bs 10}
 sleep 50
@@ -1475,6 +1487,7 @@ Loop, parse, clipboard, `n, `r
 		or InStr(TheOrderName, "Fitbit")
 		or InStr(TheOrderName, "Suunto")
 		or InStr(TheOrderName, "Casio")
+		or InStr(TheOrderName, "Galaxy Fit")
 		{
 			If RegexMatch(TheOrderName, "i) ([a-z].*)", TheOrderNameCut) ; Обрезаем до начала названия модели
 			{
