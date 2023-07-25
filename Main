@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.8
+Script_Version := 1.9
 
 Center_X := A_ScreenWidth/2
 Center_Y := A_ScreenHeight/2
@@ -48,9 +48,12 @@ URLDownloadToVar(url)
 
 If !FileExist("Settings.ini")
 {
-	IniWrite, Имя, Settings.ini, user, name
-	IniWrite, 0, Settings.ini, user, SetOnTop
-	IniWrite, w400 h200, Settings.ini, window position, gui_position
+	IniWrite, 0, Settings.ini, window position, RemoveWindow
+	IniWrite, 0 0, Settings.ini, EzCad coords, Cadclick1
+	IniWrite, 0 0, Settings.ini, EzCad coords, Cadclick2
+	IniWrite, 0 0, Settings.ini, EzCad coords, Cadclick3
+	IniWrite, 0 0, Settings.ini, EzCad coords, Cadclick4
+	IniWrite, 0 0, Settings.ini, EzCad coords, Cadclick5
 }
 
 IniRead, username, Settings.ini, user, name, Имя
@@ -80,6 +83,13 @@ IniRead, Y_Zakaz, Settings.ini, Yandex, Y_Zakaz
 IniRead, Y_Kartinka, Settings.ini, Yandex, Y_Kartinka
 IniRead, Y_Etiketka, Settings.ini, Yandex, Y_Etiketka
 
+IniRead, RemoveWindow, Settings.ini, window position, RemoveWindow, 0
+IniRead, Cadclick1, Settings.ini, EzCad coords, Cadclick1
+IniRead, Cadclick2, Settings.ini, EzCad coords, Cadclick2
+IniRead, Cadclick3, Settings.ini, EzCad coords, Cadclick3
+IniRead, Cadclick4, Settings.ini, EzCad coords, Cadclick4
+IniRead, Cadclick5, Settings.ini, EzCad coords, Cadclick5
+
 LoadMainGUI()
 If LaunchMinimized and (LaunchMinimized != "Error") ; Сразу свернуть, если выбрана эта опция
 		WinMinimize, %A_ScriptName%
@@ -104,11 +114,14 @@ LoadMainGUI()
 SpawnGUI()
 {
 	global
-	IniRead, gui_position, Settings.ini, window position, gui_position, "x300 y200 w250 h250"
-	Gui, Show, %gui_position%
-	Gui +Resize
-	If SetOnTop and (SetOnTop != "Error")
-		WinSet, AlwaysOnTop, On, %A_ScriptName%
+	If !RemoveWindow
+	{
+		IniRead, gui_position, Settings.ini, window position, gui_position, "x300 y200 w250 h250"
+		Gui, Show, %gui_position%
+		Gui +Resize
+		If SetOnTop and (SetOnTop != "Error")
+			WinSet, AlwaysOnTop, On, %A_ScriptName%
+	}
 }
 
 } ; СТАРТ
@@ -205,6 +218,11 @@ Clipboard := ListviewContent
 return
 
 ButtonПереместить:
+If !APIKEY
+{
+	MsgBox, Не выбран магазин
+	return
+}
 InputBox, supplyId, %A_ScriptName%, Введите ID поставки, , 250, 130
 If supplyId
 {
@@ -402,7 +420,7 @@ If !Department or (Department == "ERROR")
 }
 global Current_Line := 1
 SendInput ^{vk43} ; Ctrl C
-sleep 300 ; Нужно для загрузки буфера
+sleep 200 ; Нужно для загрузки буфера
 OrderLine := StrSplit(clipboard, "`n", "`r")
 MPTEST := StrSplit(OrderLine[1], A_Tab) ; Проверяем маркетплейс по первой строке
 ExitFunc(MARKETPLACE) ; Запоминаем положение окна
@@ -532,7 +550,6 @@ return
 
 Massplacement:
 Gui, Templates:Submit
-Gui, Templates:Destroy
 If (MAKETTYPE == "Жетоны")
 {
 SizeX := 24
@@ -603,11 +620,12 @@ If (MAKETTYPE == "Пазлы правые")
 SizeX := 15
 SizeY := 15
 }
+Gui, Templates:Destroy
 Winactivate, EzCad
 sleep 200
 loop %Brelok_Amount%
 {
-Click 70 130
+Click 70 130 ; Click1
 sleep 200					;задержка1
 FileReadLine, The_Line, %MAKETTYPE%.txt, A_Index
 StringSplit, Coords, The_Line, %A_Space%
@@ -618,7 +636,7 @@ return
 
 PrintALL(Coord_X, Coord_Y, SizeX, SizeY) ; альт+2
 {
-Click, 80 515
+Click, 80 515 ; Click2
 sleep 100
 Sendinput {bs 10}
 sleep 50
@@ -634,11 +652,11 @@ If SIZEY
 	SendInput %SIZEY%
 SendInput {enter}
 sleep 100
-Click, 430 70
+Click, 430 70 ; Click3
 sleep 100
 Sendinput {enter}
 sleep 200
-Click, 1775 280
+Click, 1775 280 ; Click4
 }
 
 Numpad1::
@@ -822,7 +840,7 @@ return
 
 Print(Coord_X, Coord_Y) ; Жетоны
 {
-Click, 80 515
+Click, 80 515 ; Click1
 sleep 100
 Sendinput {bs 10}
 sleep 50
@@ -834,16 +852,16 @@ SendInput 24{Tab}
 sleep 50
 SendInput 38{enter}
 sleep 50
-Click, 430 70
+Click, 430 70 ; Click2
 sleep 100
 Sendinput {enter}
 sleep 100
-Click, 1775 280
+Click, 1775 280 ; CLick3
 }
 
 Print2(Coord_X, Coord_Y) ; Плашки
 {
-Click, 80 515
+Click, 80 515 ; Click1
 sleep 200
 Sendinput {bs 10}
 sleep 50
@@ -855,15 +873,16 @@ SendInput 30{Tab}
 sleep 50
 SendInput 13{enter}
 sleep 50
-Click, 430 70
+Click, 430 70 ; Click2
 sleep 100
 Sendinput {enter}
 sleep 200
-Click, 1775 280
+Click, 1775 280 ; Click3
 }
 
 #If (DEPARTMENT == "Сувенирка") and WinActive("CorelDRAW") 
 
+/*
 !3::
 Click, 660 100
 Sendinput {up 2}{right}{up}{enter}
@@ -888,6 +907,7 @@ Sendinput {down 2}{enter}
 sleep 200
 Click, 860 600
 return
+*/
 
 } ; /Сувенирка
 
