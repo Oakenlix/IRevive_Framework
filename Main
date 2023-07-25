@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.9
+Script_Version := 2.0
 
 Center_X := A_ScreenWidth/2
 Center_Y := A_ScreenHeight/2
@@ -116,7 +116,7 @@ SpawnGUI()
 	global
 	If !RemoveWindow
 	{
-		IniRead, gui_position, Settings.ini, window position, gui_position, "x300 y200 w250 h250"
+		IniRead, gui_position, Settings.ini, window position, gui_position, x300 y200 w250 h250
 		Gui, Show, %gui_position%
 		Gui +Resize
 		If SetOnTop and (SetOnTop != "Error")
