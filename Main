@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.7
+Script_Version := 1.8
 
 Center_X := A_ScreenWidth/2
 Center_Y := A_ScreenHeight/2
@@ -58,7 +58,22 @@ IniRead, department, Settings.ini, user, department
 IniRead, EnableFilter, Settings.ini, user, EnableFilter
 IniRead, SetOnTop, Settings.ini, user, SetOnTop
 IniRead, LaunchMinimized, Settings.ini, user, LaunchMinimized
+
 IniRead, gui_position, Settings.ini, window position, gui_position, w400 h200
+IniRead, OZONcol1, Settings.ini, window position, OZONcol1, 100
+IniRead, OZONcol2, Settings.ini, window position, OZONcol2, 100
+IniRead, OZONcol3, Settings.ini, window position, OZONcol3, 100
+IniRead, OZONcol4, Settings.ini, window position, OZONcol4, 100
+
+IniRead, YANDEXcol1, Settings.ini, window position, YANDEXcol1, 100
+IniRead, YANDEXcol2, Settings.ini, window position, YANDEXcol2, 100
+IniRead, YANDEXcol3, Settings.ini, window position, YANDEXcol3, 100
+IniRead, YANDEXcol4, Settings.ini, window position, YANDEXcol4, 100
+
+IniRead, WBcol1, Settings.ini, window position, WBcol1, 100
+IniRead, WBcol2, Settings.ini, window position, WBcol2, 100
+IniRead, WBcol3, Settings.ini, window position, WBcol3, 100
+IniRead, WBcol4, Settings.ini, window position, WBcol4, 100
 
 IniRead, Y_Poisk, Settings.ini, Yandex, Y_Poisk
 IniRead, Y_Zakaz, Settings.ini, Yandex, Y_Zakaz
@@ -116,17 +131,28 @@ return
 
 OnExit("ExitFunc")
 
-ExitFunc()
+ExitFunc(MARKETPLACE)
 {
 	WinActivate, %A_ScriptName%
 	WinGetPos, gui_x, gui_y, size_x, size_y, %A_ScriptName%
 	size_x -= 6
 	size_y -= 29
 	IniWrite, x%gui_x% y%gui_y% w%size_x% h%size_y%, Settings.ini, window position, gui_position
+	
+	Process, Exist
+	WinGet, hw_gui, ID, ahk_class AutoHotkeyGUI ahk_pid %ErrorLevel%
+	
+	If MARKETPLACE ; Если был открыт список заказов, запомнить ширину столбцов
+		loop 4
+		{
+			SendMessage, 0x1000+29, A_Index-1, 0, SysListView321, ahk_id %hw_gui%
+			IniWrite, %ErrorLevel%, Settings.ini, window position, %MARKETPLACE%col%A_Index%
+			IniRead, %MARKETPLACE%col%A_Index%, Settings.ini, window position, %MARKETPLACE%col%A_Index%
+		}
 }
 
 GuiClose:  ; When the window is closed.
-ExitFunc()
+ExitFunc(MARKETPLACE)
 ExitApp
 
 GUI_updatesettings:
@@ -143,8 +169,8 @@ If !SetOnTop
 return
 
 ButtonНастройки:
+ExitFunc(MARKETPLACE)
 MARKETPLACE := 
-ExitFunc()
 Gui, Destroy
 LoadMainGUI()
 return
@@ -379,7 +405,7 @@ SendInput ^{vk43} ; Ctrl C
 sleep 300 ; Нужно для загрузки буфера
 OrderLine := StrSplit(clipboard, "`n", "`r")
 MPTEST := StrSplit(OrderLine[1], A_Tab) ; Проверяем маркетплейс по первой строке
-ExitFunc() ; Запоминаем положение окна
+ExitFunc(MARKETPLACE) ; Запоминаем положение окна
 If (MARKETPLACE != "OZON") and MPTEST[4] and RegexMatch(MPTEST[1], "\d+-\d{4}-\d") ; Если ОЗОН
 {
 	ChangeMP := 1
@@ -394,9 +420,6 @@ If (MARKETPLACE != "OZON") and MPTEST[4] and RegexMatch(MPTEST[1], "\d+-\d{4}-\d
 		Gui, Add, DropDownList, w110 x+1 vSHOP_ID gSHOP_ID, PNPColor|UFpnpColor
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Артикул|Количество|Название
-	LoadTable()
-	LV_ModifyCol()
-	LV_ModifyCol(4, 200)
 }
 If (MARKETPLACE != "YANDEX") and MPTEST[4] and RegexMatch(MPTEST[1], "[0-9]{9}") and !InStr(MPTEST[1], "-") ; Если ЯНДЕКС
 {
@@ -412,9 +435,6 @@ If (MARKETPLACE != "YANDEX") and MPTEST[4] and RegexMatch(MPTEST[1], "[0-9]{9}")
 		Gui, Add, DropDownList, w110 x+1 vSHOP_ID gSHOP_ID, IRevive|UEGrafic|UEbrelki
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Название|Артикул|Количество
-	LoadTable()
-	LV_ModifyCol()
-	LV_ModifyCol(2, 200)
 }
 If !MPTEST[4] and (MARKETPLACE != "WB") 										; Если ВБ
 {
@@ -426,13 +446,11 @@ If !MPTEST[4] and (MARKETPLACE != "WB") 										; Если ВБ
 	Gui, Add, Button, x+3 vMoveOrders, Переместить
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Название|Артикул|Этикетка
-	LoadTable()
-	LV_ModifyCol()
-	LV_ModifyCol(2, 200)
-	LV_ModifyCol(4, 50)
 }
-else
-	LoadTable()
+LoadTable()
+
+Loop 4
+	LV_ModifyCol(A_Index, %MARKETPLACE%col%A_Index%)  ;% %MARKETPLACE%col%A_Index%
 
 If ChangeMP
 	SpawnGUI()
