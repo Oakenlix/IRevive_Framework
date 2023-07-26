@@ -49,7 +49,7 @@ URLDownloadToVar(url)
 If !FileExist("Settings.ini")
 {
 	IniWrite, 0, Settings.ini, window position, RemoveWindow
-	IniWrite, 1, Settings.ini, EzCad, CadSpeed1
+	IniWrite, 1, Settings.ini, EzCad, CadDelay1
 	IniWrite, 0 0, Settings.ini, EzCad, Cadclick1
 	IniWrite, 0 0, Settings.ini, EzCad, Cadclick2
 	IniWrite, 0 0, Settings.ini, EzCad, Cadclick3
@@ -85,7 +85,8 @@ IniRead, Y_Kartinka, Settings.ini, Yandex, Y_Kartinka
 IniRead, Y_Etiketka, Settings.ini, Yandex, Y_Etiketka
 
 IniRead, RemoveWindow, Settings.ini, window position, RemoveWindow, 0
-IniRead, CadSpeed1, Settings.ini, EzCad, CadSpeed1, 1
+IniRead, CadDelay1, Settings.ini, EzCad, CadDelay1, 1
+global Cadclick1
 IniRead, Cadclick1, Settings.ini, EzCad, Cadclick1
 IniRead, Cadclick2, Settings.ini, EzCad, Cadclick2
 IniRead, Cadclick3, Settings.ini, EzCad, Cadclick3
@@ -628,16 +629,17 @@ sleep 200
 loop %Brelok_Amount%
 {
 Click, 70 130 ; Click1
-sleep % 100*CadSpeed1					;задержка1
+sleep % 100*CadDelay1					;задержка1
 FileReadLine, The_Line, %MAKETTYPE%.txt, A_Index
 StringSplit, Coords, The_Line, %A_Space%
 PrintALL(Coords1, Coords2, Coords3, Coords4, SizeX, SizeY)
-sleep % 100*CadSpeed1					;задержка2
+sleep % 100*CadDelay1					;задержка2
 }
 return
 
 PrintALL(Coords1, Coords2, Coords3, Coords4, SizeX, SizeY) ; альт+2
 {
+MouseGetPos, MouseX, MouseY
 Click, %Cadclick1% ; Ввод координат
 sleep 100
 Sendinput {bs 10}
@@ -662,11 +664,13 @@ Sendinput {enter}
 sleep 200
 Click, 1775 280 ; Click4
 sleep 200
+Click, %MouseX% %MouseY%, 0
 }
 
 
 Print(Line) ; Расстановка жетонов по 1
 {
+MouseGetPos, MouseX, MouseY
 FileReadLine, The_Line, Жетоны.txt, %Line%
 StringSplit, Coords, The_Line, %A_Space%
 sleep 50
@@ -693,11 +697,12 @@ sleep 100
 Sendinput {enter}
 sleep 100
 Click, 1775 280 ; CLick3
-Click, %Center_X% %Center_Y%
+Click, %MouseX% %MouseY%, 0
 }
 
 Print2(Line) ; Расстановка плашек по 1
 {
+MouseGetPos, MouseX, MouseY
 FileReadLine, The_Line, Плашки.txt, %Line%
 StringSplit, Coords, The_Line, %A_Space%
 sleep 50
@@ -724,7 +729,7 @@ sleep 100
 Sendinput {enter}
 sleep 100
 Click, 1775 280 ; CLick3
-Click, %Center_X% %Center_Y%
+Click, %MouseX% %MouseY%, 0
 }
 
 
