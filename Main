@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.1
+Script_Version := 2.2
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -638,7 +638,7 @@ return
 
 PrintALL(Coords1, Coords2, Coords3, Coords4, SizeX, SizeY) ; альт+2
 {
-Click, 80 515 ; Click2
+Click, %Cadclick1% ; Ввод координат
 sleep 100
 Sendinput {bs 10}
 sleep 50
@@ -670,7 +670,7 @@ Print(Line) ; Расстановка жетонов по 1
 FileReadLine, The_Line, Жетоны.txt, %Line%
 StringSplit, Coords, The_Line, %A_Space%
 sleep 50
-Click, 80 515 ; Click1
+Click, %Cadclick1% ; Ввод координат
 sleep 100
 Sendinput {bs 10}
 sleep 50
@@ -701,7 +701,7 @@ Print2(Line) ; Расстановка плашек по 1
 FileReadLine, The_Line, Плашки.txt, %Line%
 StringSplit, Coords, The_Line, %A_Space%
 sleep 50
-Click, 80 515 ; Click1
+Click, %Cadclick1% ; Ввод координат
 sleep 100
 Sendinput {bs 10}
 sleep 50
