@@ -7,10 +7,10 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.0
+Script_Version := 2.1
 
-Center_X := A_ScreenWidth/2
-Center_Y := A_ScreenHeight/2
+global Center_X := A_ScreenWidth/2
+global Center_Y := A_ScreenHeight/2
 
 Updated_Version := URLDownloadToVar("https://raw.githubusercontent.com/Oakenlix/IRevive_Framework/main/Update")
 
@@ -49,11 +49,12 @@ URLDownloadToVar(url)
 If !FileExist("Settings.ini")
 {
 	IniWrite, 0, Settings.ini, window position, RemoveWindow
-	IniWrite, 0 0, Settings.ini, EzCad coords, Cadclick1
-	IniWrite, 0 0, Settings.ini, EzCad coords, Cadclick2
-	IniWrite, 0 0, Settings.ini, EzCad coords, Cadclick3
-	IniWrite, 0 0, Settings.ini, EzCad coords, Cadclick4
-	IniWrite, 0 0, Settings.ini, EzCad coords, Cadclick5
+	IniWrite, 1, Settings.ini, EzCad, CadSpeed1
+	IniWrite, 0 0, Settings.ini, EzCad, Cadclick1
+	IniWrite, 0 0, Settings.ini, EzCad, Cadclick2
+	IniWrite, 0 0, Settings.ini, EzCad, Cadclick3
+	IniWrite, 0 0, Settings.ini, EzCad, Cadclick4
+	IniWrite, 0 0, Settings.ini, EzCad, Cadclick5
 }
 
 IniRead, username, Settings.ini, user, name, Имя
@@ -84,11 +85,12 @@ IniRead, Y_Kartinka, Settings.ini, Yandex, Y_Kartinka
 IniRead, Y_Etiketka, Settings.ini, Yandex, Y_Etiketka
 
 IniRead, RemoveWindow, Settings.ini, window position, RemoveWindow, 0
-IniRead, Cadclick1, Settings.ini, EzCad coords, Cadclick1
-IniRead, Cadclick2, Settings.ini, EzCad coords, Cadclick2
-IniRead, Cadclick3, Settings.ini, EzCad coords, Cadclick3
-IniRead, Cadclick4, Settings.ini, EzCad coords, Cadclick4
-IniRead, Cadclick5, Settings.ini, EzCad coords, Cadclick5
+IniRead, CadSpeed1, Settings.ini, EzCad, CadSpeed1, 1
+IniRead, Cadclick1, Settings.ini, EzCad, Cadclick1
+IniRead, Cadclick2, Settings.ini, EzCad, Cadclick2
+IniRead, Cadclick3, Settings.ini, EzCad, Cadclick3
+IniRead, Cadclick4, Settings.ini, EzCad, Cadclick4
+IniRead, Cadclick5, Settings.ini, EzCad, Cadclick5
 
 LoadMainGUI()
 If LaunchMinimized and (LaunchMinimized != "Error") ; Сразу свернуть, если выбрана эта опция
@@ -621,264 +623,213 @@ SizeX := 15
 SizeY := 15
 }
 Gui, Templates:Destroy
-Winactivate, EzCad
+;Winactivate, EzCad
 sleep 200
 loop %Brelok_Amount%
 {
-Click 70 130 ; Click1
-sleep 200					;задержка1
+Click, 70 130 ; Click1
+sleep % 100*CadSpeed1					;задержка1
 FileReadLine, The_Line, %MAKETTYPE%.txt, A_Index
 StringSplit, Coords, The_Line, %A_Space%
-PrintALL(Coords1, Coords2, SizeX, SizeY)
-sleep 100					;задержка2
+PrintALL(Coords1, Coords2, Coords3, Coords4, SizeX, SizeY)
+sleep % 100*CadSpeed1					;задержка2
 }
 return
 
-PrintALL(Coord_X, Coord_Y, SizeX, SizeY) ; альт+2
+PrintALL(Coords1, Coords2, Coords3, Coords4, SizeX, SizeY) ; альт+2
 {
 Click, 80 515 ; Click2
 sleep 100
 Sendinput {bs 10}
 sleep 50
-SendInput %Coord_X%{Tab}
+SendInput %Coords1%{Tab}
 sleep 50
-SendInput %Coord_Y%{Tab}
+SendInput %Coords2%{Tab}
 sleep 50
-If SIZEX
-	SendInput %SIZEX%
-SendInput {Tab}
+If Coords3
+	SendInput %Coords3%{Tab}
+else
+	SendInput %SizeX%{Tab}
 sleep 50
-If SIZEY
-	SendInput %SIZEY%
-SendInput {enter}
+If Coords4
+	SendInput %Coords4%{enter}
+else
+	SendInput %SizeY%{enter}
 sleep 100
 Click, 430 70 ; Click3
 sleep 100
 Sendinput {enter}
 sleep 200
 Click, 1775 280 ; Click4
+sleep 200
 }
 
-Numpad1::
-FileReadLine, The_Line, Жетоны.txt, 1
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
 
-Numpad2::
-FileReadLine, The_Line, Жетоны.txt, 2
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-Numpad3::
-FileReadLine, The_Line, Жетоны.txt, 3
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-Numpad4::
-FileReadLine, The_Line, Жетоны.txt, 4
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-Numpad5::
-FileReadLine, The_Line, Жетоны.txt, 5
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-Numpad6::
-FileReadLine, The_Line, Жетоны.txt, 6
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-Numpad7::
-FileReadLine, The_Line, Жетоны.txt, 7
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-Numpad8::
-FileReadLine, The_Line, Жетоны.txt, 8
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-Numpad9::
-FileReadLine, The_Line, Жетоны.txt, 9
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-Numpad0::
-FileReadLine, The_Line, Жетоны.txt, 10
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-^Numpad1::
-FileReadLine, The_Line, Жетоны.txt, 11
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-^Numpad2::
-FileReadLine, The_Line, Жетоны.txt, 12
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-^Numpad3::
-FileReadLine, The_Line, Жетоны.txt, 13
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-^Numpad4::
-FileReadLine, The_Line, Жетоны.txt, 14
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-^Numpad5::
-FileReadLine, The_Line, Жетоны.txt, 15
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print(Coords1, Coords2)
-return
-
-
-
-; КОЖАНЫЕ
-
-!Numpad1::
-FileReadLine, The_Line, Плашки.txt, 1
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print2(Coords1, Coords2)
-return
-
-!Numpad2::
-FileReadLine, The_Line, Плашки.txt, 2
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print2(Coords1, Coords2)
-return
-
-!Numpad3::
-FileReadLine, The_Line, Плашки.txt, 3
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print2(Coords1, Coords2)
-return
-
-!Numpad4::
-FileReadLine, The_Line, Плашки.txt, 4
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print2(Coords1, Coords2)
-return
-
-!Numpad5::
-FileReadLine, The_Line, Плашки.txt, 5
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print2(Coords1, Coords2)
-return
-
-!Numpad6::
-FileReadLine, The_Line, Плашки.txt, 6
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print2(Coords1, Coords2)
-return
-
-!Numpad7::
-FileReadLine, The_Line, Плашки.txt, 7
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print2(Coords1, Coords2)
-return
-
-!Numpad8::
-FileReadLine, The_Line, Плашки.txt, 8
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print2(Coords1, Coords2)
-return
-
-!Numpad9::
-FileReadLine, The_Line, Плашки.txt, 9
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print2(Coords1, Coords2)
-return
-
-!Numpad0::
-FileReadLine, The_Line, Плашки.txt, 10
-StringSplit, Coords, The_Line, %A_Space%
-sleep 50
-Print2(Coords1, Coords2)
-return
-
-Print(Coord_X, Coord_Y) ; Жетоны
+Print(Line) ; Расстановка жетонов по 1
 {
+FileReadLine, The_Line, Жетоны.txt, %Line%
+StringSplit, Coords, The_Line, %A_Space%
+sleep 50
 Click, 80 515 ; Click1
 sleep 100
 Sendinput {bs 10}
 sleep 50
-SendInput %Coord_X%{Tab}
+SendInput %Coords1%{Tab}
 sleep 50
-SendInput %Coord_Y%{Tab}
+SendInput %Coords2%{Tab}
 sleep 50
-SendInput 24{Tab}
+If Coords3
+	SendInput %Coords3%{Tab}
+else
+	SendInput 24{Tab}
 sleep 50
-SendInput 38{enter}
+If Coords4
+	SendInput %Coords4%{enter}
+else
+	SendInput 38{enter}
 sleep 50
 Click, 430 70 ; Click2
 sleep 100
 Sendinput {enter}
 sleep 100
 Click, 1775 280 ; CLick3
+Click, %Center_X% %Center_Y%
 }
 
-Print2(Coord_X, Coord_Y) ; Плашки
+Print2(Line) ; Расстановка плашек по 1
 {
+FileReadLine, The_Line, Плашки.txt, %Line%
+StringSplit, Coords, The_Line, %A_Space%
+sleep 50
 Click, 80 515 ; Click1
-sleep 200
+sleep 100
 Sendinput {bs 10}
 sleep 50
-SendInput %Coord_X%{Tab}
+SendInput %Coords1%{Tab}
 sleep 50
-SendInput %Coord_Y%{Tab}
+SendInput %Coords2%{Tab}
 sleep 50
-SendInput 30{Tab}
+If Coords3
+	SendInput %Coords3%{Tab}
+else
+	SendInput 30{Tab}
 sleep 50
-SendInput 13{enter}
+If Coords4
+	SendInput %Coords4%{enter}
+else
+	SendInput 13{enter}
 sleep 50
 Click, 430 70 ; Click2
 sleep 100
 Sendinput {enter}
-sleep 200
-Click, 1775 280 ; Click3
+sleep 100
+Click, 1775 280 ; CLick3
+Click, %Center_X% %Center_Y%
 }
+
+
+Numpad1::
+Print(1)
+return
+
+Numpad2::
+Print(2)
+return
+
+Numpad3::
+Print(3)
+return
+
+Numpad4::
+Print(4)
+return
+
+Numpad5::
+Print(5)
+return
+
+Numpad6::
+Print(6)
+return
+
+Numpad7::
+Print(7)
+return
+
+Numpad8::
+Print(8)
+return
+
+Numpad9::
+Print(9)
+return
+
+Numpad0::
+Print(10)
+return
+
+^Numpad1::
+Print(11)
+return
+
+^Numpad2::
+Print(12)
+return
+
+^Numpad3::
+Print(13)
+return
+
+^Numpad4::
+Print(14)
+return
+
+^Numpad5::
+Print(15)
+return
+
+
+; КОЖАНЫЕ
+
+!Numpad1::
+Print2(1)
+return
+
+!Numpad2::
+Print2(2)
+return
+
+!Numpad3::
+Print2(3)
+return
+
+!Numpad4::
+Print2(4)
+return
+
+!Numpad5::
+Print2(5)
+return
+
+!Numpad6::
+Print2(6)
+return
+
+!Numpad7::
+Print2(7)
+return
+
+!Numpad8::
+Print2(8)
+return
+
+!Numpad9::
+Print2(9)
+return
+
+!Numpad0::
+Print2(10)
+return
 
 #If (DEPARTMENT == "Сувенирка") and WinActive("CorelDRAW") 
 
