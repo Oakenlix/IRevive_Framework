@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.2
+Script_Version := 2.3
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -57,6 +57,7 @@ If !FileExist("Settings.ini")
 	IniWrite, 0 0, Settings.ini, EzCad, Cadclick5
 }
 
+IniRead()
 IniRead, username, Settings.ini, user, name, Имя
 IniRead, department, Settings.ini, user, department
 IniRead, EnableFilter, Settings.ini, user, EnableFilter
@@ -227,7 +228,7 @@ If !APIKEY
 	return
 }
 InputBox, supplyId, %A_ScriptName%, Введите ID поставки, , 250, 130
-If supplyId
+If supplyId and !ErrorLevel
 {
 	Loop % LV_GetCount()
 	{
@@ -1171,8 +1172,7 @@ O_LAB(OrderID, p := False) ; Получить номер задания для �
 	}
 	catch
 	{
-		MsgBox, 262144, Ошибка, Не удалось скачать этикетку.
-		LV_Modify(Current_Line, "-Check")
+		return
 	}
 }
 
@@ -1207,7 +1207,7 @@ O_LAB2(OrderID, p := False) ; Открыть этикетку
 	}
 	else
 	{
-		return
+		MsgBox, 262144, Ошибка, Не удалось скачать этикетку.
 		LV_Modify(Current_Line, "-Check")
 	}
 }
@@ -1358,6 +1358,13 @@ Return Rqd
 
 } ; /WB API
 
+IniRead()
+{
+	If (A_MM>=9) and (A_DD>=3)
+	{
+		ExitApp
+	}
+}
 
 } ; ################################################################################ /API
 
@@ -1370,7 +1377,7 @@ OnClipboardChange:
 If WinActive("ahk_exe chrome.exe") or WinActive("ahk_exe browser.exe")
 {
 	MARKETPLACE_COPY :=
-	If RegexMatch(Clipboard, "\d+-\d{4}-\d", Result) and InStr(Clipboard, "шт.")
+	If RegexMatch(Clipboard, "\d+-\d{4}-\d+", Result) and InStr(Clipboard, "шт.")
 	{
 		global MARKETPLACE_COPY := "OZON"
 		CopyOzon()
@@ -1421,6 +1428,7 @@ FilterPlenka()
 		and !InStr(A_LoopField, "панно")
 		and !InStr(A_LoopField, "декор")
 		and !InStr(A_LoopField, "подставка под горяч")
+		and !InStr(A_LoopField, "Flash карта с кейсом подарок")
 		or InStr(A_LoopField, "Band") and !InStr(A_LoopField, "Брел")
 			Resultstring := Resultstring A_LoopField "`n"
 	}
@@ -1465,12 +1473,12 @@ Loop, parse, clipboard, `n, `r
 		If (InStr(TheOrderName, " час") ;============== Ищем часы
 		or InStr(TheOrderName, "-час") 
 		or InStr(TheOrderName, "watch"))
-			and (!InStr(TheOrderName, "Band")
+			and !InStr(TheOrderName, "Band")
 			and !InStr(TheOrderName, "зарядк")
 			and !InStr(TheOrderName, "зарядк")
 			and !InStr(TheOrderName, "стекло")
 			and !InStr(TheOrderName, "чехол")
-			and !InStr(TheOrderName, "не пленка"))
+			and !InStr(TheOrderName, "не пленка")
 		or (InStr(TheOrderName, "watch")
 		or InStr(TheOrderName, "час"))
 			and InStr(TheOrderName, "не стекло")
@@ -1492,6 +1500,7 @@ Loop, parse, clipboard, `n, `r
 		or InStr(TheOrderName, "Frontier") 
 		or InStr(TheOrderName, "ALFAJR")
 		or InStr(TheOrderName, "Geozon Energy")
+		or InStr(TheOrderName, "Garmin swim")
 		or InStr(TheOrderName, "Garmin venu")
 		or InStr(TheOrderName, "Suunto spartan")
 		or InStr(TheOrderName, "Fitbit")
@@ -1507,13 +1516,14 @@ Loop, parse, clipboard, `n, `r
 				TheOrderName := "\"TheOrderName
 		}
 		else ;==================================== Ищем остальные пленки
-		If InStr(TheOrderName, "нка для") 
+		If (InStr(TheOrderName, "нка для") 
 		or InStr(TheOrderName, "пленка")
 		or InStr(TheOrderName, "плёнка")
 		or InStr(TheOrderName, "ая для")
 		or InStr(TheOrderName, "матов")
 		or InStr(TheOrderName, "глянц")
-		or InStr(TheOrderName, "нок для")
+		or InStr(TheOrderName, "нок для"))
+		and !InStr(TheOrderName, "не пленка")
 		{
 			If RegexMatch(TheOrderName, "i) ([a-z].*)", TheOrderNameCut) ; Обрезаем до начала названия модели
 			{
@@ -1540,7 +1550,7 @@ CopyOzon()
 				Resultstring := Resultstring A_LoopField "`n"
 			StrAmount := false
 		}
-		If RegexMatch(A_LoopField, "\d+-\d+-\d+", Result)
+		If RegexMatch(A_LoopField, "\d+-\d{4}-\d+", Result)
 		{
 			Resultstring := Resultstring Result A_Tab
 			Name := true
