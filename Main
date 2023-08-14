@@ -188,6 +188,7 @@ return
 ButtonНастройки:
 ExitFunc(MARKETPLACE)
 MARKETPLACE := 
+SHOP_ID :=
 Gui, Destroy
 LoadMainGUI()
 return
@@ -212,6 +213,7 @@ if (A_GuiEvent = "RightClick") ; Клик правой ;
 	IfMsgBox, Yes 
 	{
 		LV_Delete(A_EventInfo)
+		Gui, Show, , % "IRevive.ahk - [" LV_GetCount() "]"
 	}
 }
 if (A_GuiEvent = "ColClick") ; Клик на заголовок ;
@@ -474,6 +476,8 @@ LoadTable()
 Loop 4
 	LV_ModifyCol(A_Index, %MARKETPLACE%col%A_Index%)  ;% %MARKETPLACE%col%A_Index%
 
+Gui, Show, , % "IRevive.ahk - [" LV_GetCount() "]"
+
 If ChangeMP
 	SpawnGUI()
 return
@@ -511,10 +515,6 @@ return
 
 #If (DEPARTMENT == "Сувенирка")
 {
-TemplatesGuiClose:
-Gui, Templates:destroy
-return
-
 !1::
 KeyWait, Lalt
 sleep 100
@@ -552,8 +552,12 @@ WinSet, AlwaysOnTop, On, %A_ScriptName%
 GuiControl, Templates:Focus, Brelok_Amount
 return
 
+TemplatesGuiClose:
+Gui, Templates:destroy
+return
+
 Massplacement:
-Gui, Templates:Submit
+Gui, Templates:Submit, NoHide
 If (MAKETTYPE == "Жетоны")
 {
 SizeX := 24
@@ -919,7 +923,7 @@ If O_LAB2(O_LAB(OrderNumber))
 	WinGetActiveTitle, Title
 	If InStr(Title, "posting-label-") or InStr(Title, ".pdf")
 		{
-		sleep 1000
+		sleep 1200
 		SendInput ^{vk50} ; ctrl+P
 		sleep 2000
 		SendInput {enter}
@@ -1005,7 +1009,7 @@ If InStr(Title, "Заказы и отгрузки")
 
 	sleep 3000
 	
-	Loop 25 ; Цикл проверки загрузки ярлыка
+	Loop 40 ; Цикл проверки загрузки ярлыка
 		{
 			WinGetActiveTitle, Title
 			If RegexMatch(Title, "\w{8}-\w{4}-\w{4}-\w{4}-\w{12}", Result)
@@ -1376,28 +1380,28 @@ IniRead()
 OnClipboardChange:
 If WinActive("ahk_exe chrome.exe") or WinActive("ahk_exe browser.exe")
 {
-	MARKETPLACE_COPY :=
+	global MARKETPLACE_COPY :=
 	If RegexMatch(Clipboard, "\d+-\d{4}-\d+", Result) and InStr(Clipboard, "шт.")
 	{
-		global MARKETPLACE_COPY := "OZON"
+		MARKETPLACE_COPY := "OZON"
 		CopyOzon()
 		Sorting(4)
 	}
 	If RegexMatch(Clipboard, "\d{9} / \d{9}", Result)
 	{
-		global MARKETPLACE_COPY := "YANDEX"
+		MARKETPLACE_COPY := "YANDEX"
 		CopyYandex()
 		Sorting(2)
 	}
 	If InStr(Clipboard, "Ожидает подтверждения передачи") and InStr(Clipboard, "ID:")
 	{
-		global MARKETPLACE_COPY := "ALI"
+		MARKETPLACE_COPY := "ALI"
 		CopyALI()
 		Sorting(2)
 	}
 	If InStr(Clipboard, "2023") and InStr(Clipboard, "Арт.")
 	{
-		global MARKETPLACE_COPY := "WB"
+		MARKETPLACE_COPY := "WB"
 		CopyWB()
 		Sorting(2)
 	}
@@ -1408,7 +1412,6 @@ If WinActive("ahk_exe chrome.exe") or WinActive("ahk_exe browser.exe")
 		If (Department == "Сувенирка") ; Фильтруем сувенирку
 			FilterSuvenirka()
 	}
-		
 }
 return
 
@@ -1429,6 +1432,8 @@ FilterPlenka()
 		and !InStr(A_LoopField, "декор")
 		and !InStr(A_LoopField, "подставка под горяч")
 		and !InStr(A_LoopField, "Flash карта с кейсом подарок")
+		and !InStr(A_LoopField, "из дерева")
+		and !InStr(A_LoopField, "деревянная в подарок")
 		or InStr(A_LoopField, "Band") and !InStr(A_LoopField, "Брел")
 			Resultstring := Resultstring A_LoopField "`n"
 	}
@@ -1478,6 +1483,7 @@ Loop, parse, clipboard, `n, `r
 			and !InStr(TheOrderName, "зарядк")
 			and !InStr(TheOrderName, "стекло")
 			and !InStr(TheOrderName, "чехол")
+			and !InStr(TheOrderName, "кейс")
 			and !InStr(TheOrderName, "не пленка")
 		or (InStr(TheOrderName, "watch")
 		or InStr(TheOrderName, "час"))
