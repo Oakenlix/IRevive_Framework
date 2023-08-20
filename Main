@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.5
+Script_Version := 2.6
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -1274,7 +1274,8 @@ W_MOVE(orderId, supplyId) { ; ##################################################
 }
 
 
-W_PIC(OrderID) { ; ################################################################### Креатив
+W_PIC(OrderID) ; ################################################################### Креатив
+{ 
 	try
 	{
 		OrderID -= 1
@@ -1304,6 +1305,7 @@ W_PIC(OrderID) { ; #############################################################
 
 W_LAB(OrderID, p := False) ; ################# Этикетка
 {
+	FileDelete, temp.bmp
 	try
 	{
 		OrderID += 0
@@ -1530,6 +1532,7 @@ Loop, parse, clipboard, `n, `r
 		or InStr(TheOrderName, "глянц")
 		or InStr(TheOrderName, "нок для"))
 		and !InStr(TheOrderName, "не пленка")
+		and !InStr(TheOrderName, "кейс")
 		{
 			If RegexMatch(TheOrderName, "i) ([a-z].*)", TheOrderNameCut) ; Обрезаем до начала названия модели
 			{
@@ -1578,26 +1581,40 @@ CopyYandex()
 {
 	Loop, parse, clipboard, `n, `r
 	{
-		If RegexMatch(A_LoopField, "\d+ / (.*)", Result)
+		If Instr(A_LoopField, "Свернуть") or Instr(A_LoopField, "Обрабатывается") or RegexMatch(A_LoopField, "\d{2}\.\d{2}\.\d{4}")
+			Count := 
+		
+		If (Mod(Count, 2)==0) and (Count == 2)
+		{
+			Resultstring := Resultstring A_LoopField A_Tab
+		}
+		If (Mod(Count, 2)==0) and (Count > 2)
+		{
+			Resultstring := Resultstring A_Tab A_LoopField A_Tab
+		}
+		If (Mod(Count, 2)==1) 
+		{
+			If RegexMatch(A_LoopField, "(.*)`; (.*) шт", Result)
+			{
+				Resultstring := Resultstring Result1 A_tab Result2 "`n"
+			}
+			else 
+				Resultstring := Resultstring A_LoopField A_tab "1 `n"
+		}
+
+		If RegexMatch(A_LoopField, "№ \d{9} / (.*)", Result)
 		{
 			Resultstring := Resultstring Result1 A_Tab
-			Name := true
-		}
-		If RegexMatch(A_LoopField, "(.*) · (.*) шт.", Result) ; Новый яндекс
-		{
-			If Name
-				Resultstring := Resultstring OldString A_Tab Result1 A_Tab Result2 "`n"
-			If !Name
-				Resultstring := Resultstring A_tab OldString A_Tab Result1 A_Tab Result2 "`n"
-			Name := false
+			Count := 1
 		}
 		If RegexMatch(A_LoopField, "Ещё \d товар", Result)
 		{
 			MsgBox, Есть еще товар, нужно развернуть все заказы
 			break
 		}
-		If A_LoopField
-			OldString := A_LoopField
+		If Count
+			Count += 1
+
 	}
 	Clipboard := Resultstring
 } ; Конец Яндекса
