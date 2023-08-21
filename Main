@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.7
+Script_Version := 2.8
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -1214,8 +1214,6 @@ O_LAB2(OrderID, p := False) ; Открыть этикетку
 			LV_Modify(Current_Line, "-Check")
 			return false
 		}
-	}
-			
 	}
 	else
 	{
