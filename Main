@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.6
+Script_Version := 2.7
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -476,10 +476,10 @@ LoadTable()
 Loop 4
 	LV_ModifyCol(A_Index, %MARKETPLACE%col%A_Index%)  ;% %MARKETPLACE%col%A_Index%
 
-Gui, Show, , % "IRevive.ahk - [" LV_GetCount() "]"
-
 If ChangeMP
 	SpawnGUI()
+If LV_GetCount()
+	Gui, Show, , % A_ScriptName " - [" LV_GetCount() "]"
 return
 
 LoadTable() ; ДОБАВЛЕНИЕ ТАБЛИЦЫ В LISTVIEW
@@ -1208,11 +1208,20 @@ O_LAB2(OrderID, p := False) ; Открыть этикетку
 			Run, % label_url1
 			return true
 		}
+		else
+		{
+			MsgBox, 262144, Ошибка, Не удалось скачать этикетку.
+			LV_Modify(Current_Line, "-Check")
+			return false
+		}
+	}
+			
 	}
 	else
 	{
 		MsgBox, 262144, Ошибка, Не удалось скачать этикетку.
 		LV_Modify(Current_Line, "-Check")
+		return false
 	}
 }
 
@@ -1581,7 +1590,7 @@ CopyYandex()
 {
 	Loop, parse, clipboard, `n, `r
 	{
-		If Instr(A_LoopField, "Свернуть") or Instr(A_LoopField, "Обрабатывается") or RegexMatch(A_LoopField, "\d{2}\.\d{2}\.\d{4}")
+		If Instr(A_LoopField, "Свернуть") or Instr(A_LoopField, "Обрабатывается") or Instr(A_LoopField, "Отменён") or RegexMatch(A_LoopField, "\d{2}\.\d{2}\.\d{4}") 
 			Count := 
 		
 		If (Mod(Count, 2)==0) and (Count == 2)
