@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.9
+Script_Version := 3.0
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -254,6 +254,16 @@ SHOP_ID:
 global APIKEY :=
 global CLIENTID :=
 Gui, Submit, NoHide
+
+If (SHOP_ID == "Броня")
+	APIKEY := "placeholder"
+If (SHOP_ID == "Премиум")
+	APIKEY := "placeholder"
+If (SHOP_ID == "УЕаксы")
+	APIKEY := "placeholder"
+If (SHOP_ID == "УЕПленка")
+	APIKEY := "placeholder"
+
 If (SHOP_ID == 1)
 	APIKEY := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6IjE1YjljOWVhLTdmNzAtNGFhMy05YjlmLTJkOTBiYzQ5NTIwMiJ9.aklMsffH8T9dZjqWPrPpC9piErvl7j22rcRQitJz-Mk"
 If (SHOP_ID == 2)
@@ -549,29 +559,6 @@ If (MARKETPLACE == "OZON")
 	Ozon1()
 If (MARKETPLACE == "WB")
 {
-	If !APIKEY
-	{
-		MsgBox, Не выбран магазин
-		return
-	}
-	If !WinActive("ahk_exe chrome.exe") and !WinActive("ahk_exe browser.exe")
-	{
-		WinActivate, ahk_exe chrome.exe
-		WinActivate, ahk_exe browser.exe
-		sleep 200
-	}
-	sleep 100
-	loop 10 
-	{
-		WinGetActiveTitle, Title
-		If InStr(Title, "в интернет-магазине Wildberries") or InStr(Title, "temp.bmp (580")
-		{
-			SendInput ^{vk57} ; CTRL+W Закрыть вкладку
-		}
-		else break
-		sleep 100
-	}
-
 	If !NextOrder()
 		return
 	LV_GetText(OrderNumber, Current_Line, 1)
@@ -1012,12 +999,7 @@ else
 Yandex1() ;========================================================= YANDEX
 {
 global
-If !WinActive("ahk_exe chrome.exe") and !WinActive("ahk_exe browser.exe")
-{
-	WinActivate, ahk_exe chrome.exe
-	WinActivate, ahk_exe browser.exe
-	sleep 200
-}
+
 loop 10 ; Чистка вкладок
 {
 	WinGetActiveTitle, Title
@@ -1038,17 +1020,17 @@ loop 10 ; Чистка вкладок
 	}
 	sleep 100
 }
-SendInput {esc}
-sleep 300
 
 If !NextOrder()
 	return
 LV_GetText(OrderNumber, Current_Line, 1)
 
-sleep 100
+sleep 200
+SendInput {esc}
+sleep 200
 WinGetActiveTitle, Title
 If InStr(Title, "Заказы и отгрузки")
-{	
+{
 	SendInput {tab}
 	sleep 100
 	SendInput {home}
@@ -1110,7 +1092,7 @@ NextOrder() ; ##### Переход к следующему неотмеченн�
 {
 	If !APIKEY
 	{
-		MsgBox, Не выбран магазин
+		MsgBox, Не выбран магазин (nextorder)
 		return
 	}
 	If !WinActive("ahk_exe chrome.exe") and !WinActive("ahk_exe browser.exe")
