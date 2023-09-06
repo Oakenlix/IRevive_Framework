@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.1
+Script_Version := 1.2
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -1027,7 +1027,7 @@ LV_GetText(OrderNumber, Current_Line, 1)
 
 sleep 200
 SendInput {esc}
-sleep 200
+sleep 400
 WinGetActiveTitle, Title
 If InStr(Title, "Заказы и отгрузки")
 {
@@ -1578,7 +1578,7 @@ Loop, parse, clipboard, `n, `r
 		or InStr(TheOrderName, "Polar")
 		or InStr(TheOrderName, "Amazfit")
 		or InStr(TheOrderName, "Huawei band")
-		or InStr(TheOrderName, "Honor magic ")
+		or (InStr(TheOrderName, "Honor magic ") and !InStr(TheOrderName, "Honor magic 3 pro"))
 		or InStr(TheOrderName, "Jet sport")
 		or InStr(TheOrderName, "Jet kid")
 		or InStr(TheOrderName, "Garmin fore")
@@ -1600,6 +1600,7 @@ Loop, parse, clipboard, `n, `r
 		or InStr(TheOrderName, "Casio")
 		or InStr(TheOrderName, "Galaxy Fit")
 		or InStr(TheOrderName, "Realme S Pro 38мм")
+		or InStr(TheOrderName, "MI SMART BAND")
 		{
 			If RegexMatch(TheOrderName, "i) ([a-z].*)", TheOrderNameCut) ; Обрезаем до начала названия модели
 			{
