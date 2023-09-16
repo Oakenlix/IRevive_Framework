@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.2
+Script_Version := 1.3
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -227,25 +227,6 @@ if (A_GuiEvent = "ColClick") ; Клик на заголовок ;
 { 
 ControlGet, ListviewContent, List,, SysListView321, %A_ScriptName%
 Clipboard := ListviewContent
-}
-return
-
-ButtonПереместить:
-If !APIKEY
-{
-	MsgBox, Не выбран магазин
-	return
-}
-InputBox, supplyId, %A_ScriptName%, Введите ID поставки, , 250, 130
-If supplyId and !ErrorLevel
-{
-	Loop % LV_GetCount()
-	{
-		LV_GetText(RowText, 1, 1) 
-		If W_MOVE(RowText, supplyId)
-			LV_Delete(1)
-		else break
-	}
 }
 return
 
@@ -484,7 +465,6 @@ If !MPTEST[4] and (MARKETPLACE != "WB") 										; Если ВБ
 	MARKETPLACE := "WB"	
 	Gui, Add, Text,, WB ИП:
 	Gui, Add, DropDownList, w70 x+1 vSHOP_ID gSHOP_ID, 1|2|3|4
-	Gui, Add, Button, x+3 vMoveOrders, Переместить
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Название|Артикул|Этикетка
 }
@@ -1092,7 +1072,7 @@ NextOrder() ; ##### Переход к следующему неотмеченн�
 {
 	If !APIKEY
 	{
-		MsgBox, Не выбран магазин (nextorder)
+		MsgBox, Не выбран магазин [функция nextorder]
 		return
 	}
 	If !WinActive("ahk_exe chrome.exe") and !WinActive("ahk_exe browser.exe")
@@ -1327,28 +1307,6 @@ O_PIC(OrderID, p := False) ; Получить информацию о заказ
 
 { ; WB API
 
-
-W_MOVE(orderId, supplyId) { ; ################################################### Перемещение в поставку
-	try
-	{
-		orderId += 0
-		APIURL := "https://suppliers-api.wildberries.ru/api/v3/supplies/" supplyId "/orders/" orderId
-		WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-		WebRequest.Open("PATCH", APIURL)
-		WebRequest.SetRequestHeader("Content-Type", "application/json")
-		WebRequest.SetRequestHeader("Authorization", APIKEY)
-		WebRequest.Send()
-		arr := WebRequest.responseBody
-		Return, true
-	}
-	catch
-	{
-		MsgBox, 262144, Ошибка, Не удалось переместить заказ.
-		return
-	}
-}
-
-
 W_PIC(OrderID) ; ################################################################### Креатив
 { 
 	try
@@ -1380,6 +1338,7 @@ W_PIC(OrderID) ; ###############################################################
 
 W_LAB(OrderID, p := False) ; ################# Этикетка
 {
+	FileDelete, temp.bmp
 	try
 	{
 		OrderID += 0
@@ -1421,9 +1380,7 @@ W_LAB(OrderID, p := False) ; ################# Этикетка
 			MsgBox, 262144, Ошибка, Не удалось открыть этикетку.
 			LV_Modify(Current_Line, "-Check")
 			return
-		}
-		FileDelete, temp.bmp
-		
+		}		
 	}
 }
 
@@ -1520,6 +1477,7 @@ FilterPlenka()
 		and !InStr(A_LoopField, "Flash карта с кейсом подарок")
 		and !InStr(A_LoopField, "из дерева")
 		and !InStr(A_LoopField, "деревянная в подарок")
+		and !InStr(A_LoopField, "Подарок для влюбленных")
 		or InStr(A_LoopField, "Band") and !InStr(A_LoopField, "Брел")
 			Resultstring := Resultstring A_LoopField "`n"
 	}
@@ -1601,6 +1559,7 @@ Loop, parse, clipboard, `n, `r
 		or InStr(TheOrderName, "Galaxy Fit")
 		or InStr(TheOrderName, "Realme S Pro 38мм")
 		or InStr(TheOrderName, "MI SMART BAND")
+		or InStr(TheOrderName, "Mi Band")
 		{
 			If RegexMatch(TheOrderName, "i) ([a-z].*)", TheOrderNameCut) ; Обрезаем до начала названия модели
 			{
