@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.3
+Script_Version := 1.4
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -566,7 +566,7 @@ return
 !2::
 KeyWait, Lalt
 Gui, Templates:Add, Text, y+10, Тип:
-Gui, Templates:Add, DropDownList, w100 x+2 vMAKETTYPE, Жетоны||Плашки|Лезвия|Косточки Б|Круги|Столбики|Металлические браслеты|Кулоны|Резина|Ручка Slim (колпачок)|Ручка Slim (основание)|Ручка Стилус (колпачок)|Ручка Стилус (основание)|Пазлы левые|Пазлы правые
+Gui, Templates:Add, DropDownList, w100 x+2 vMAKETTYPE, Жетоны||Плашки|Лезвия|Косточки М|Косточки СР|Косточки Б|Круги|Столбики|Металлические браслеты|Двойные браслеты|Кулоны|Резина|Ручка Slim (колпачок)|Ручка Slim (основание)|Ручка Стилус (колпачок)|Ручка Стилус (основание)|Пазлы левые|Пазлы правые
 Gui, Templates:Add, Text, xs y+5, Кол-во макетов:
 Gui, Templates:Add, Edit, w60 x+3 vBrelok_Amount
 Gui, Templates:Add, Button, xs gMassplacement default, OK  ; OK
@@ -595,91 +595,6 @@ return
 
 Placement(MAKETTYPE, Line) ; Расстановка макетов
 {
-If (MAKETTYPE == "Жетоны")
-{
-SizeX := 24
-SizeY := 38
-}
-If (MAKETTYPE == "Плашки")
-{
-SizeX := 30
-SizeY := 13
-}
-If (MAKETTYPE == "Лезвия")
-{
-SizeX := 17
-SizeY := 32
-}
-If (MAKETTYPE == "Косточки М")
-{
-SizeX := 14
-SizeY := 6
-}
-If (MAKETTYPE == "Косточки СР")
-{
-SizeX := 25
-SizeY := 11
-}
-If (MAKETTYPE == "Косточки Б")
-{
-SizeX := 35
-SizeY := 16
-}
-If (MAKETTYPE == "Круги")
-{
-SizeX := 45
-SizeY := 45
-}
-If (MAKETTYPE == "Столбики")
-{
-SizeX := 4.8
-SizeY := 43
-}
-If (MAKETTYPE == "Металлические браслеты")
-{
-SizeX := 
-SizeY := 5
-}
-If (MAKETTYPE == "Кулоны")
-{
-SizeX := 19.333
-SizeY := 19.333
-}
-If (MAKETTYPE == "Резина")
-{
-SizeX := 
-SizeY := 5
-}
-If (MAKETTYPE == "Ручка Slim (колпачок)")
-{
-SizeX := 
-SizeY := 6
-}
-If (MAKETTYPE == "Ручка Slim (основание)")
-{
-SizeX := 
-SizeY := 4
-}
-If (MAKETTYPE == "Ручка Стилус (колпачок)")
-{
-SizeX := 
-SizeY := 6
-}
-If (MAKETTYPE == "Ручка Стилус (основание)")
-{
-SizeX := 
-SizeY := 4
-}
-If (MAKETTYPE == "Пазлы левые")
-{
-SizeX := 12
-SizeY := 15
-}
-If (MAKETTYPE == "Пазлы правые")
-{
-SizeX := 15
-SizeY := 15
-}
 FileReadLine, The_Line, %MAKETTYPE%.txt, Line
 StringSplit, Coords, The_Line, %A_Space%
 MouseGetPos, MouseX, MouseY
@@ -693,13 +608,13 @@ SendInput %Coords2%{Tab}
 sleep 50
 If Coords3
 	SendInput %Coords3%{Tab}
-else
-	SendInput %SizeX%{Tab}
+else 
+	SendInput {Tab}
 sleep 50
 If Coords4
 	SendInput %Coords4%{enter}
-else
-	SendInput %SizeY%{enter}
+else 
+	SendInput {Tab}
 sleep 100
 Click, 430 70 ; Click3
 sleep 100
@@ -997,24 +912,23 @@ loop 10 ; Чистка вкладок
 	else If !InStr(Title, "Заказы и отгрузки")
 	{
 		SendInput ^{PgUp}		 ; Предыдущая вкладка
+		sleep 100
 	}
-	sleep 100
 }
 
 If !NextOrder()
 	return
 LV_GetText(OrderNumber, Current_Line, 1)
 
-sleep 200
+sleep 300
 SendInput {esc}
 sleep 400
 WinGetActiveTitle, Title
 If InStr(Title, "Заказы и отгрузки")
 {
 	SendInput {tab}
-	sleep 100
 	SendInput {home}
-	sleep 200
+	sleep 300
 	Click, % Y_Poisk		; Окно поиска
 	sleep 100
 	Clipboard := OrderNumber
@@ -1030,7 +944,7 @@ If InStr(Title, "Заказы и отгрузки")
 	Click, % Y_Etiketka			; Ярлык
 	Click, 0 90 Rel								; Ярлык 2
 
-	sleep 3000
+	sleep 2000
 	
 	Loop 40 ; Цикл проверки загрузки ярлыка
 		{
@@ -1559,7 +1473,6 @@ Loop, parse, clipboard, `n, `r
 		or InStr(TheOrderName, "Galaxy Fit")
 		or InStr(TheOrderName, "Realme S Pro 38мм")
 		or InStr(TheOrderName, "MI SMART BAND")
-		or InStr(TheOrderName, "Mi Band")
 		{
 			If RegexMatch(TheOrderName, "i) ([a-z].*)", TheOrderNameCut) ; Обрезаем до начала названия модели
 			{
