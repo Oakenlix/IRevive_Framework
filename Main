@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.4
+Script_Version := 1.5
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -614,7 +614,7 @@ sleep 50
 If Coords4
 	SendInput %Coords4%{enter}
 else 
-	SendInput {Tab}
+	SendInput {enter}
 sleep 100
 Click, 430 70 ; Click3
 sleep 100
@@ -1473,6 +1473,7 @@ Loop, parse, clipboard, `n, `r
 		or InStr(TheOrderName, "Galaxy Fit")
 		or InStr(TheOrderName, "Realme S Pro 38мм")
 		or InStr(TheOrderName, "MI SMART BAND")
+		or InStr(TheOrderName, "Mi band 6")
 		{
 			If RegexMatch(TheOrderName, "i) ([a-z].*)", TheOrderNameCut) ; Обрезаем до начала названия модели
 			{
