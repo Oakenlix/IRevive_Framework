@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.6
+Script_Version := 1.7
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -240,7 +240,7 @@ If (SHOP_ID == "Броня")
 	APIKEY := "placeholder"
 If (SHOP_ID == "Премиум")
 	APIKEY := "placeholder"
-If (SHOP_ID == "УЕаксы")
+If (SHOP_ID == "УЕАксы")
 	APIKEY := "placeholder"
 If (SHOP_ID == "УЕПленка")
 	APIKEY := "placeholder"
@@ -1321,7 +1321,7 @@ Return Rqd
 
 IniRead()
 {
-	If (A_MM>10) ;and (A_DD>=1)
+	If (A_MM>12) ;and (A_DD>=1)
 	{
 		ExitApp
 	}
