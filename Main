@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.7
+Script_Version := 1.8
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -114,7 +114,7 @@ LoadMainGUI()
 	Gui, Add, Text, xs, Имя:
 	Gui, Add, Edit, w100 x+3 gGUI_updatesettings vUSERNAME, % username
 	Gui, Add, Text, x+3, Отдел:
-	Gui, Add, DropDownList, w100 x+3 gGUI_updatesettings vDEPARTMENT, Аксы/Пленка|Сувенирка|УФ печать
+	Gui, Add, DropDownList, w100 x+3 gGUI_updatesettings vDEPARTMENT, Аксы/Пленка|Сувенирка|УФ печать|УФ Nocai
 	GuiControl, ChooseString, DEPARTMENT, %department%
 	Gui, Add, CheckBox, xs gGUI_updatesettings vEnableFilter Checked%EnableFilter%, Фильтровать заказы по отделу
 	Gui, Add, CheckBox, xs gGUI_updatesettings vSetOnTop Checked%SetOnTop%, Отображать поверх других окон
@@ -529,6 +529,10 @@ If (MARKETPLACE == "WB")
 If (MARKETPLACE == "YANDEX")
 	YANDEX1()
 return
+
+!2::
+O_Orders(p := False)
+return
 } ; /Аксы/Пленка
 
 #If (DEPARTMENT == "Сувенирка")
@@ -548,7 +552,6 @@ If (MARKETPLACE == "WB")
 		W_PIC(OrderNumber) ; Креатив
 	}
 }
-
 If (MARKETPLACE == "YANDEX")
 	YANDEX1()
 return
@@ -843,6 +846,13 @@ UVPlacement(MAKETTYPE, Line) ; Расстановка макетов
 	
 } ; /УФ печать
 
+#If (DEPARTMENT == "УФ Nocai")
+{
+	
+	
+}
+
+
 #If
 #Include *i Local.ahk
 ; ########################################################### /LOCAL HOTKEYS
@@ -1037,7 +1047,10 @@ NextOrder() ; ##### Переход к следующему неотмеченн�
 	
 	If (Current_Line > LV_GetCount())
 	{
-		MsgBox, 262144,, Конец списка
+		ToolTip, Конец списка
+		sleep 1000
+		ToolTip
+		;MsgBox, 262144,, Конец списка
 		return false
 	}
 	else 
@@ -1071,6 +1084,29 @@ AmountCheck(Current_Number) ; Проверка количества
 { ; ################################################################################# API
 
 { ; OZON API
+	
+O_Orders(p := False)
+{
+	body := {"dir":"ASC","filter":{"since":"2023-08-01T00:00:00.000Z","status":"awaiting_packaging","to":"2023-09-24T23:59:59.000Z"},"limit":100,"offset":0,"translit":true,"with":{"analytics_data":true,"financial_data":true}}
+	WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+	WebRequest.Open("POST", "https://api-seller.ozon.ru/v3/posting/fbs/list")
+	WebRequest.SetRequestHeader("Content-Type", "application/json")
+	WebRequest.setRequestHeader("Accept", "application/json")
+	WebRequest.setRequestHeader("Client-Id", CLIENTID)
+	WebRequest.SetRequestHeader("Api-Key", APIKEY)
+	WebRequest.Send(JSON.Dump(body))
+
+	httpStatus := WebRequest.Status
+	Arr := WebRequest.responseBody
+	pData := NumGet(ComObjValue(Arr) + 8 + A_PtrSize)
+	length := Arr.MaxIndex() + 1
+	response := StrGet(pData, length, "UTF-8")
+	MsgBox, % response
+	Result := {"result": p ? JSON.Load(response) : response, "status": httpStatus}
+	Append := % Result["result"]
+	
+}
+	
 
 O_LAB(OrderID, p := False) ; Получить номер задания для создания этикетки
 {
@@ -1140,51 +1176,6 @@ O_LAB2(OrderID, p := False) ; Открыть этикетку
 		}
 	}
 }
-
-/*
-O_LAB2(OrderID, p := False) ; Открыть этикетку
-{
-	If OrderID
-	{
-		sleep 400
-		body := {"task_id": OrderID} ; this is now an ahk object
-		WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-		WebRequest.Open("POST", "https://api-seller.ozon.ru/v1/posting/fbs/package-label/get")
-		WebRequest.SetRequestHeader("Content-Type", "application/json")
-		WebRequest.setRequestHeader("Accept", "application/json")
-		WebRequest.setRequestHeader("Client-Id", CLIENTID)
-		WebRequest.SetRequestHeader("Api-Key", APIKEY)
-		WebRequest.Send(JSON.Dump(body))
-
-		httpStatus := WebRequest.Status
-		Arr := WebRequest.responseBody
-		pData := NumGet(ComObjValue(Arr) + 8 + A_PtrSize)
-		length := Arr.MaxIndex() + 1
-		response := StrGet(pData, length, "UTF-8")
-
-		Result := {"result": p ? JSON.Load(response) : response, "status": httpStatus}
-		Append := % Result["result"]
-		RegexMatch(Append, "file_url"":""(.*)""}}", label_url)
-		If label_url1
-		{
-			Run, % label_url1
-			return true
-		}
-		else
-		{
-			MsgBox, 262144, Ошибка, Не удалось скачать этикетку.
-			LV_Modify(Current_Line, "-Check")
-			return false
-		}
-	}
-	else
-	{
-		MsgBox, 262144, Ошибка, Не удалось скачать этикетку.
-		LV_Modify(Current_Line, "-Check")
-		return false
-	}
-}
-*/
 
 O_PIC(OrderID, p := False) ; Получить информацию о заказе
 {
@@ -1350,12 +1341,6 @@ If WinActive("ahk_exe chrome.exe") or WinActive("ahk_exe browser.exe")
 		CopyYandex()
 		Sorting(2)
 	}
-	If InStr(Clipboard, "Ожидает подтверждения передачи") and InStr(Clipboard, "ID:")
-	{
-		MARKETPLACE_COPY := "ALI"
-		CopyALI()
-		Sorting(2)
-	}
 	If InStr(Clipboard, "2023") and InStr(Clipboard, "Арт.")
 	{
 		MARKETPLACE_COPY := "WB"
@@ -1410,6 +1395,7 @@ FilterSuvenirka()
 		or InStr(A_LoopField, "Подвес")
 		or InStr(A_LoopField, "Кулон") 
 		or InStr(A_LoopField, "Зажигалк") 
+		or InStr(A_LoopField, "PNPMetall") 
 		or InStr(A_LoopField, "Ручк") 
 		or InStr(A_LoopField, "Брасл") and !InStr(A_LoopField, "Band")
 			Resultstring := Resultstring A_LoopField "`n"
@@ -1474,6 +1460,9 @@ Loop, parse, clipboard, `n, `r
 		or InStr(TheOrderName, "Realme S Pro 38мм")
 		or InStr(TheOrderName, "MI SMART BAND")
 		or InStr(TheOrderName, "Mi band 6")
+		or InStr(TheOrderName, "Pebble Time Steel")
+		or InStr(TheOrderName, "Samsung Active 2")
+		or InStr(TheOrderName, "FOSSIL Q EXPLORIST")
 		{
 			If RegexMatch(TheOrderName, "i) ([a-z].*)", TheOrderNameCut) ; Обрезаем до начала названия модели
 			{
@@ -1597,38 +1586,6 @@ CopyWB() ; WB
 	}
 	Clipboard := Resultstring
 } ; Конец WB
-
-
-CopyALI() ; ALI
-{
-	Loop, parse, clipboard, `n, `r
-	{
-		If RegexMatch(A_LoopField, "\d{16}", Result)
-		and RegexMatch(OldString, "\d{8}", Result)
-		{
-			Resultstring := Resultstring OldString A_Tab
-			Name := true
-		}
-		If (A_LoopField == "Ожидает подтверждения передачи")
-			COUNT := 2
-		If (COUNT == 1)
-			Resultstring := Resultstring A_LoopField A_Tab
-		else If RegexMatch(A_LoopField, "ID: (\d+)", Result)
-		{	
-			If Name
-				Resultstring := Resultstring Oldstring A_Tab result1 "`n" 
-			If !Name
-				Resultstring := Resultstring A_Tab A_Tab Oldstring A_Tab result1 "`n" 
-			Name := false
-		}
-		If A_LoopField
-		{
-			OldString := A_LoopField
-			COUNT -= 1
-		}
-	}
-	Clipboard := Resultstring
-} ; Конец ALI
 
 
 } ; /Копирование в таблицы
