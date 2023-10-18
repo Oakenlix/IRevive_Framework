@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.8
+Script_Version := 1.9
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -1329,7 +1329,7 @@ OnClipboardChange:
 If WinActive("ahk_exe chrome.exe") or WinActive("ahk_exe browser.exe")
 {
 	global MARKETPLACE_COPY :=
-	If RegexMatch(Clipboard, "\d+-\d{4}-\d+", Result) and InStr(Clipboard, "шт.")
+	If RegexMatch(Clipboard, "\d+-\d{4}-\d+", Result) and InStr(Clipboard, "доставка Ozon")
 	{
 		MARKETPLACE_COPY := "OZON"
 		CopyOzon()
@@ -1463,6 +1463,9 @@ Loop, parse, clipboard, `n, `r
 		or InStr(TheOrderName, "Pebble Time Steel")
 		or InStr(TheOrderName, "Samsung Active 2")
 		or InStr(TheOrderName, "FOSSIL Q EXPLORIST")
+		or InStr(TheOrderName, "Imilab KW66")
+		or InStr(TheOrderName, "GARMIN Descent")
+		or InStr(TheOrderName, "LITTLE GENIUS")
 		{
 			If RegexMatch(TheOrderName, "i) ([a-z].*)", TheOrderNameCut) ; Обрезаем до начала названия модели
 			{
@@ -1513,7 +1516,7 @@ CopyOzon()
 			Resultstring := Resultstring Result A_Tab
 			Name := true
 		}
-		If RegexMatch(A_LoopField, "(.*), (.*) шт\.", Result)
+		If RegexMatch(A_LoopField, "(.*), (\d+) шт\.", Result)
 		{
 			If Name
 				Resultstring := Resultstring Result1 A_Tab Result2 A_Tab
@@ -1545,7 +1548,7 @@ CopyYandex()
 		}
 		If (Mod(Count, 2)==1) 
 		{
-			If RegexMatch(A_LoopField, "(.*)`; (.*) шт", Result)
+			If RegexMatch(A_LoopField, "(.*) · (.*) шт", Result)
 			{
 				Resultstring := Resultstring Result1 A_tab Result2 "`n"
 			}
@@ -1553,7 +1556,7 @@ CopyYandex()
 				Resultstring := Resultstring A_LoopField A_tab "1 `n"
 		}
 
-		If RegexMatch(A_LoopField, "№ \d{9} / (.*)", Result)
+		If RegexMatch(A_LoopField, "№ \d{9} / (.*)", Result) 
 		{
 			Resultstring := Resultstring Result1 A_Tab
 			Count := 1
