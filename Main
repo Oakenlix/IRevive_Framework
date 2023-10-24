@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 1.9
+Script_Version := 2.0
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -227,6 +227,25 @@ if (A_GuiEvent = "ColClick") ; Клик на заголовок ;
 { 
 ControlGet, ListviewContent, List,, SysListView321, %A_ScriptName%
 Clipboard := ListviewContent
+}
+return
+
+ButtonПереместить:
+If !APIKEY
+{
+	MsgBox, Не выбран магазин
+	return
+}
+InputBox, supplyId, %A_ScriptName%, Введите ID поставки, , 250, 130
+If supplyId and !ErrorLevel
+{
+	Loop % LV_GetCount()
+	{
+		LV_GetText(RowText, 1, 1) 
+		If W_MOVE(RowText, supplyId)
+			LV_Delete(1)
+		else break
+	}
 }
 return
 
@@ -465,6 +484,7 @@ If !MPTEST[4] and (MARKETPLACE != "WB") 										; Если ВБ
 	MARKETPLACE := "WB"	
 	Gui, Add, Text,, WB ИП:
 	Gui, Add, DropDownList, w70 x+1 vSHOP_ID gSHOP_ID, 1|2|3|4
+	Gui, Add, Button, x+3 vMoveOrders, Переместить
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Название|Артикул|Этикетка
 }
@@ -1212,6 +1232,27 @@ O_PIC(OrderID, p := False) ; Получить информацию о заказ
 
 { ; WB API
 
+W_MOVE(orderId, supplyId) { ; ################################################### Перемещение в поставку
+	try
+	{
+		orderId += 0
+		APIURL := "https://suppliers-api.wildberries.ru/api/v3/supplies/" supplyId "/orders/" orderId
+		WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+		WebRequest.Open("PATCH", APIURL)
+		WebRequest.SetRequestHeader("Content-Type", "application/json")
+		WebRequest.SetRequestHeader("Authorization", APIKEY)
+		WebRequest.Send()
+		arr := WebRequest.responseBody
+		Return, true
+	}
+	catch
+	{
+		MsgBox, 262144, Ошибка, Не удалось переместить заказ.
+		return
+	}
+}
+
+
 W_PIC(OrderID) ; ################################################################### Креатив
 { 
 	try
@@ -1377,6 +1418,8 @@ FilterPlenka()
 		and !InStr(A_LoopField, "из дерева")
 		and !InStr(A_LoopField, "деревянная в подарок")
 		and !InStr(A_LoopField, "Подарок для влюбленных")
+		and !InStr(A_LoopField, "свитш")
+		and !InStr(A_LoopField, "худи")
 		or InStr(A_LoopField, "Band") and !InStr(A_LoopField, "Брел")
 			Resultstring := Resultstring A_LoopField "`n"
 	}
