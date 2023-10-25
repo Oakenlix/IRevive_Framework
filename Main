@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.0
+Script_Version := 2.1
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -60,6 +60,10 @@ If !FileExist("Settings.ini")
 IniRead()
 IniRead, username, Settings.ini, user, name, Имя
 IniRead, department, Settings.ini, user, department
+If (DEPARTMENT == "Сувенирка") or (DEPARTMENT == "УФ печать")
+{
+	IniWrite, 0, Settings.ini, user, EnableFilter
+}
 IniRead, EnableFilter, Settings.ini, user, EnableFilter
 IniRead, SetOnTop, Settings.ini, user, SetOnTop
 IniRead, LaunchMinimized, Settings.ini, user, LaunchMinimized
@@ -100,7 +104,6 @@ IniRead, UVclick3, Settings.ini, UV, UVclick3
 IniRead, UVclick4, Settings.ini, UV, UVclick4
 IniRead, UVclick5, Settings.ini, UV, UVclick5
 
-
 LoadMainGUI()
 If LaunchMinimized and (LaunchMinimized != "Error") ; Сразу свернуть, если выбрана эта опция
 		WinMinimize, %A_ScriptName%
@@ -134,6 +137,7 @@ SpawnGUI()
 			WinSet, AlwaysOnTop, On, %A_ScriptName%
 	}
 }
+
 
 } ; СТАРТ
 
@@ -1276,6 +1280,7 @@ W_PIC(OrderID) ; ###############################################################
 		pData := NumGet(ComObjValue(arr) + 8 + A_PtrSize)
 		length := arr.MaxIndex() + 1
 		text := StrGet(pData, length, "utf-8")
+		FileAppend, %text%, result2.txt
 		RegexMatch(text, "U)""nmId"":(.*),", OrderPicture)
 		Run, % "https://www.wildberries.ru/catalog/" OrderPicture1 "/detail.aspx?targetUrl=GP"
 	}
@@ -1439,7 +1444,8 @@ FilterSuvenirka()
 		or InStr(A_LoopField, "Кулон") 
 		or InStr(A_LoopField, "Зажигалк") 
 		or InStr(A_LoopField, "PNPMetall") 
-		or InStr(A_LoopField, "Ручк") 
+		or InStr(A_LoopField, "Ручк")  
+		or InStr(A_LoopField, "Сувенирный набор бокс") 
 		or InStr(A_LoopField, "Брасл") and !InStr(A_LoopField, "Band")
 			Resultstring := Resultstring A_LoopField "`n"
 	}
