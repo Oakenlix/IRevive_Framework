@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.1
+Script_Version := 2.2
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -870,11 +870,57 @@ UVPlacement(MAKETTYPE, Line) ; Расстановка макетов
 	
 } ; /УФ печать
 
-#If (DEPARTMENT == "УФ Nocai")
+#If (DEPARTMENT == "УФ Nocai") and WinActive("Corel") 
 {
-	
-	
+
+!2::
+KeyWait, Lalt
+MouseGetPos, MouseX, MouseY
+Gui, Templates:Add, Text, y+10, Тип:
+Gui, Templates:Add, DropDownList, w150 x+2 vMAKETTYPE, Жетоны||Че-то еще
+Gui, Templates:Add, Text, xs y+5, Кол-во макетов:
+Gui, Templates:Add, Edit, w60 x+3 vBrelok_Amount
+Gui, Templates:Add, Button, xs gMassplacement default, OK  ; OK
+Gui, Templates:Show, w220 h100
+WinSet, AlwaysOnTop, On, %A_ScriptName%
+GuiControl, Templates:Focus, Brelok_Amount
+return
+
+TemplatesGuiClose:
+Gui, Templates:destroy
+return
+
+Massplacement:
+Gui, Templates:Submit, NoHide
+Gui, Templates:Destroy
+sleep 200
+loop %Brelok_Amount%
+{
+	Placement_Nocai(MAKETTYPE, A_Index)
+	sleep % 100*CadDelay1					;задержка1
 }
+return
+
+Placement_Nocai(MAKETTYPE, Line) ; Расстановка макетов
+{
+	global
+	FileReadLine, The_Line, %MAKETTYPE%.txt, Line
+	StringSplit, Coords, The_Line, %A_Space%
+	Click, %MouseX% %MouseY%
+	sleep 200
+	Click, %Cadclick1% ; Координата Х Click, 130 90 ; Ввод координат
+	Sendinput ^{vk41}{bs}
+	sleep 50
+	SendInput %Coords1%{Tab}
+	sleep 50
+	SendInput %Coords2%{Tab}
+	sleep 50
+	SendInput %Coords3%{Tab}
+	sleep 50
+	SendInput %Coords4%{enter}
+}
+	
+} ; /УФ nocai
 
 
 #If
@@ -897,9 +943,9 @@ If O_LAB2(O_LAB(OrderNumber))
 	WinGetActiveTitle, Title
 	If InStr(Title, "posting-label-") or InStr(Title, ".pdf")
 		{
-		sleep 1200
+		sleep 2200
 		SendInput ^{vk50} ; ctrl+P
-		sleep 2000
+		sleep 3000
 		SendInput {enter}
 		sleep 800
 		break
