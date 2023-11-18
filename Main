@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.2
+Script_Version := 2.3
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -796,12 +796,12 @@ return
 
 !2::
 KeyWait, Lalt
-Gui, Templates:Add, Text, y+10, Тип:
-Gui, Templates:Add, DropDownList, w100 x+2 vMAKETTYPE, Жетоны||Круги|Пазлы|Зажигалки|Зажигалки чрн|Дер. брелки|Футляры|Флешки
-Gui, Templates:Add, Text, xs y+5, Кол-во макетов:
-Gui, Templates:Add, Edit, w60 x+3 vBrelok_Amount
-Gui, Templates:Add, Button, xs gUVMassplacement default, OK  ; OK
-Gui, Templates:Show, w200 h100
+Gui, UVTemplates:Add, Text, y+10, Тип:
+Gui, UVTemplates:Add, DropDownList, w100 x+2 vMAKETTYPE, Жетоны||Круги|Пазлы|Зажигалки|Зажигалки чрн|Дер. брелки|Футляры|Флешки
+Gui, UVTemplates:Add, Text, xs y+5, Кол-во макетов:
+Gui, UVTemplates:Add, Edit, w60 x+3 vBrelok_Amount
+Gui, UVTemplates:Add, Button, xs gUVMassplacement default, OK  ; OK
+Gui, UVTemplates:Show, w200 h100
 WinSet, AlwaysOnTop, On, %A_ScriptName%
 GuiControl, Templates:Focus, Brelok_Amount
 return
@@ -876,21 +876,21 @@ UVPlacement(MAKETTYPE, Line) ; Расстановка макетов
 !2::
 KeyWait, Lalt
 MouseGetPos, MouseX, MouseY
-Gui, Templates:Add, Text, y+10, Тип:
-Gui, Templates:Add, DropDownList, w150 x+2 vMAKETTYPE, Жетоны||Че-то еще
-Gui, Templates:Add, Text, xs y+5, Кол-во макетов:
-Gui, Templates:Add, Edit, w60 x+3 vBrelok_Amount
-Gui, Templates:Add, Button, xs gMassplacement default, OK  ; OK
-Gui, Templates:Show, w220 h100
+Gui, NocaiTemplates:Add, Text, y+10, Тип:
+Gui, NocaiTemplates:Add, DropDownList, w150 x+2 vMAKETTYPE, Жетоны||Че-то еще
+Gui, NocaiTemplates:Add, Text, xs y+5, Кол-во макетов:
+Gui, NocaiTemplates:Add, Edit, w60 x+3 vBrelok_Amount
+Gui, NocaiTemplates:Add, Button, xs gNocaiMassplacement default, OK  ; OK
+Gui, NocaiTemplates:Show, w220 h100
 WinSet, AlwaysOnTop, On, %A_ScriptName%
 GuiControl, Templates:Focus, Brelok_Amount
 return
 
-TemplatesGuiClose:
+NocaiTemplatesGuiClose:
 Gui, Templates:destroy
 return
 
-Massplacement:
+NocaiMassplacement:
 Gui, Templates:Submit, NoHide
 Gui, Templates:Destroy
 sleep 200
