@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.4
+Script_Version := 2.5
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -1117,10 +1117,10 @@ NextOrder() ; ##### Переход к следующему неотмеченн�
 	
 	If (Current_Line > LV_GetCount())
 	{
-		ToolTip, Конец списка
-		sleep 1000
-		ToolTip
-		;MsgBox, 262144,, Конец списка
+		;ToolTip, Конец списка
+		;sleep 1000
+		;ToolTip
+		MsgBox, 262144,, Все сделано! Ты молодец!
 		return false
 	}
 	else 
