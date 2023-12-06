@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.5
+Script_Version := 2.6
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -24,6 +24,7 @@ If (Script_Version != Updated_Version)
 		FileCreateDir, %A_ScriptDir%\Backups
 		FileMove, %A_ScriptName%, %A_ScriptDir%\Backups\%A_Hour%%A_Min%-%A_DD%%A_MM%.ahk
 		FileAppend, %Updated_text%, %A_ScriptName%
+		MsgBox, Обновление: добавлено быстрое списание/перемещение со склада. Спросите Руслана, он покажет.`nКнопки:`nF1 - загрузить список,`nF2 - продолжить.
 		Run, %A_ScriptName%
 		ExitApp
 	}
@@ -435,6 +436,33 @@ return
 :?:/яз::
 SendInput % A_DD "." A_Mon A_Space username
 SendInput {enter}на завтра{tab}{up}
+return
+
+F1::
+KeyWait, Lalt
+SendInput ^{vk43} ; Ctrl C
+sleep 200
+MyIndex :=
+
+If Clipboard
+Loop, parse, Clipboard, `n
+{
+	KeyWait, F2, D
+	KeyWait, F2
+    StorageItem := StrSplit(A_LoopField, A_Tab)
+	SendInput % StorageItem[1]
+	KeyWait, F2, D
+	KeyWait, F2
+	SendInput {enter}
+	KeyWait, F2, D
+	KeyWait, F2
+	SendInput % StorageItem[2]
+	sleep 100
+	SendInput {enter}
+
+}
+sleep 300
+MsgBox, Готово
 return
 
 !0::
