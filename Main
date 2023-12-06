@@ -24,7 +24,6 @@ If (Script_Version != Updated_Version)
 		FileCreateDir, %A_ScriptDir%\Backups
 		FileMove, %A_ScriptName%, %A_ScriptDir%\Backups\%A_Hour%%A_Min%-%A_DD%%A_MM%.ahk
 		FileAppend, %Updated_text%, %A_ScriptName%
-		MsgBox, Обновление: добавлено быстрое списание/перемещение со склада. Спросите Руслана, он покажет.`nКнопки:`nF1 - загрузить список,`nF2 - продолжить.
 		Run, %A_ScriptName%
 		ExitApp
 	}
