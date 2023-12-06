@@ -492,30 +492,6 @@ If !MPTEST[4] and (MARKETPLACE != "WB") 										; Если ВБ
 	Gui, Add, Button, x+3, Настройки
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Название|Артикул|Этикетка
 }
-If !MPTEST[3]
-{
-	If Clipboard
-	Loop, parse, Clipboard, `n
-	{
-		KeyWait, F1, D
-		KeyWait, F1
-		StorageItem := StrSplit(A_LoopField, A_Tab)
-		SendInput % StorageItem[1]
-		KeyWait, F1, D
-		KeyWait, F1
-		SendInput {enter}
-		KeyWait, F1, D
-		KeyWait, F1
-		SendInput % StorageItem[2]
-		sleep 100
-		SendInput {enter}
-
-	}
-	sleep 300
-	MsgBox, Готово
-	return
-}
-
 
 LoadTable()
 
