@@ -7,27 +7,25 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.8
+Script_Version := 2.9
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
 
-Updated_Version := URLDownloadToVar("https://raw.githubusercontent.com/Oakenlix/IRevive_Framework/main/Update")
 
-If Updated_Version
+
+Updated_Text := URLDownloadToVar("https://raw.githubusercontent.com/Oakenlix/IRevive_Framework/main/Main")
+RegexMatch(Updated_Text, "Script_Version := (\d.\d)", Updated_Version)
+If (Updated_Version1 != Script_Version)
 {
-RegexMatch(Updated_Version, "\w.\w", Updated_Version)
-
-If (Script_Version != Updated_Version)
-	{
-		Updated_text := URLDownloadToVar("https://raw.githubusercontent.com/Oakenlix/IRevive_Framework/main/Main")
-		FileCreateDir, %A_ScriptDir%\Backups
-		FileMove, %A_ScriptName%, %A_ScriptDir%\Backups\%A_Hour%%A_Min%-%A_DD%%A_MM%.ahk
-		FileAppend, %Updated_text%, %A_ScriptName%
-		Run, %A_ScriptName%
-		ExitApp
-	}
+	FileCreateDir, %A_ScriptDir%\Backups
+	FileMove, %A_ScriptName%, %A_ScriptDir%\Backups\%A_Hour%%A_Min%-%A_DD%%A_MM%.ahk
+	FileAppend, %Updated_Text%, %A_ScriptName%
+	sleep 100
+	Run, %A_ScriptName%
+	ExitApp
 }
+Updated_Text :=
 	
 URLDownloadToVar(url) 
 {
@@ -435,6 +433,33 @@ return
 :?:/яз::
 SendInput % A_DD "." A_Mon A_Space username
 SendInput {enter}на завтра{tab}{up}
+return
+
+F3::
+KeyWait, Lalt
+SendInput ^{vk43} ; Ctrl C
+sleep 200
+If Clipboard
+Loop, parse, Clipboard, `n
+{
+	KeyWait, F4, D
+	KeyWait, F4
+    StorageItem := StrSplit(A_LoopField, A_Tab)
+	SendInput % StorageItem[1]
+	KeyWait, F4, D
+	KeyWait, F4
+	SendInput {enter}
+	KeyWait, F4, D
+	KeyWait, F4
+	SendInput % StorageItem[2]
+	sleep 100
+	SendInput {enter}
+}
+sleep 300
+MsgBox, Готово
+return
+
+F4::
 return
 
 !0::
