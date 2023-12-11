@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 2.9
+Script_Version := 3.0
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -619,7 +619,7 @@ return
 !2::
 KeyWait, Lalt
 Gui, Templates:Add, Text, y+10, Тип:
-Gui, Templates:Add, DropDownList, w150 x+2 vMAKETTYPE, Жетоны||Плашки|Лезвия|Косточки М|Косточки СР|Косточки Б|Круги|Столбики|Металлические браслеты|Двойные браслеты|Кулоны|Резина|Ручка Slim (колпачок)|Ручка Slim (основание)|Ручка Стилус (колпачок)|Ручка Стилус (основание)|Пазлы левые|Пазлы правые
+Gui, Templates:Add, DropDownList, w150 x+2 vMAKETTYPE, Жетоны||Плашки|Лезвия|Косточки М|Косточки СР|Косточки Б|Круги|Столбики|Металлические браслеты|Двойные браслеты|Кулоны|Резина|Ручка Slim (колпачок)|Ручка Slim (основание)|Ручка Стилус (колпачок)|Ручка Стилус (основание)|Пазлы левые|Пазлы правые|Пазлы форма|Круги форма|Браслеты б форма|Браслеты м форма|Зажигалки форма|Медиаторы форма|Сердца м форма|Сердца б форма
 Gui, Templates:Add, Text, xs y+5, Кол-во макетов:
 Gui, Templates:Add, Edit, w60 x+3 vBrelok_Amount
 Gui, Templates:Add, Button, xs gMassplacement default, OK  ; OK
@@ -803,7 +803,7 @@ return
 
 } ; /Сувенирка
 
-#If (DEPARTMENT == "УФ печать")
+#If (DEPARTMENT == "УФ печать") ; УФ синий принтер
 {
 
 SetSize:
@@ -814,8 +814,8 @@ size2 := 29.6
 sleep1 := 50
 sleep2 := 200
 
-VisotaX := 1855 
-VisotaY := 340 
+VisotaX := 1855
+VisotaY := 340
 ZeroX := 780
 ZeroY := 85
 return
