@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 3.5
+Script_Version := 3.6
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -16,7 +16,8 @@ global Center_Y := A_ScreenHeight/2
 
 Updated_Text := URLDownloadToVar("https://raw.githubusercontent.com/Oakenlix/IRevive_Framework/main/Main")
 RegexMatch(Updated_Text, "Script_Version := (\d.\d)", Updated_Version)
-If (Updated_Version1 != Script_Version)
+If Updated_Version1
+and (Updated_Version1 != Script_Version)
 {
 	FileCreateDir, %A_ScriptDir%\Backups
 	FileMove, %A_ScriptName%, %A_ScriptDir%\Backups\%A_Hour%%A_Min%-%A_DD%%A_MM%.ahk
