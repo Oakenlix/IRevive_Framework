@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 3.8
+Script_Version := 3.9
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -950,7 +950,7 @@ UVPlacement(MAKETTYPE, Line) ; Расстановка макетов
 KeyWait, Lalt
 MouseGetPos, MouseX, MouseY
 Gui, NocaiTemplates:Add, Text, y+10, Тип:
-Gui, NocaiTemplates:Add, DropDownList, w150 x+2 vMAKETTYPE, Жетоны||Че-то еще
+Gui, NocaiTemplates:Add, DropDownList, w150 x+2 vMAKETTYPE, Жетоны||Чехлы
 Gui, NocaiTemplates:Add, Text, xs y+5, Кол-во макетов:
 Gui, NocaiTemplates:Add, Edit, w60 x+3 vBrelok_Amount
 Gui, NocaiTemplates:Add, Button, xs gNocaiMassplacement default, OK  ; OK
