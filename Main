@@ -3,11 +3,12 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 StringCaseSense, Locale
+#SingleInstance Force
 #Include <JSON> ; AHK-JSON lib ; https://github.com/cocobelgica/AutoHotkey-JSON
 
 { ; СТАРТ
 
-Script_Version := 3.9
+Script_Version := 4.0
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
