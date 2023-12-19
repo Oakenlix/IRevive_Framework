@@ -7,7 +7,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 3.6
+Script_Version := 3.7
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -116,7 +116,7 @@ LoadMainGUI()
 	Gui, Add, Text, xs, Имя:
 	Gui, Add, Edit, w100 x+3 gGUI_updatesettings vUSERNAME, % username
 	Gui, Add, Text, x+3, Отдел:
-	Gui, Add, DropDownList, w100 x+3 gGUI_updatesettings vDEPARTMENT, Аксы/Пленка|Сувенирка|УФ печать|УФ Nocai
+	Gui, Add, DropDownList, w130 x+3 gGUI_updatesettings vDEPARTMENT, Аксы/Пленка|Сувенирка|УФ печать|УФ Nocai
 	GuiControl, ChooseString, DEPARTMENT, %department%
 	Gui, Add, CheckBox, xs gGUI_updatesettings vEnableFilter Checked%EnableFilter%, Фильтровать заказы по отделу
 	Gui, Add, CheckBox, xs gGUI_updatesettings vSetOnTop Checked%SetOnTop%, Отображать поверх других окон
@@ -609,7 +609,8 @@ If (MARKETPLACE == "YANDEX")
 	YANDEX1()
 return
 
-#If (DEPARTMENT == "Сувенирка") and WinActive("EzCad") 
+#If (DEPARTMENT == "Сувенирка") and WinActive("EzCad")
+or (DEPARTMENT == "Сувенирка") and WinActive("BslAppSimple")
 
 Numpadmult::
 Click, %Cadclick2%
@@ -622,7 +623,7 @@ return
 !2::
 KeyWait, Lalt
 Gui, Templates:Add, Text, y+10, Тип:
-Gui, Templates:Add, DropDownList, w150 x+2 vMAKETTYPE, Жетоны||Плашки|Лезвия|Косточки М|Косточки СР|Косточки Б|Круги|Столбики|Металлические браслеты|Двойные браслеты|Кулоны|Резина|Ручка Slim (колпачок)|Ручка Slim (основание)|Ручка Стилус (колпачок)|Ручка Стилус (основание)|Пазлы левые|Пазлы правые|Дер. брелки|Дер. круги
+Gui, Templates:Add, DropDownList, w150 x+2 vMAKETTYPE, Жетоны||Плашки|Лезвия|Косточки М|Косточки СР|Косточки Б|Круги|Столбики|Металлические браслеты|Двойные браслеты|Кулоны|Резина|Ручка Slim (колпачок)|Ручка Slim (основание)|Ручка Стилус (колпачок)|Ручка Стилус (основание)|Пазлы левые|Пазлы правые|Флешки|Дер. брелки|Дер. круги
 Gui, Templates:Add, Text, xs y+5, Кол-во макетов:
 Gui, Templates:Add, Edit, w60 x+3 vBrelok_Amount
 Gui, Templates:Add, Button, xs gMassplacement default, OK  ; OK
@@ -638,11 +639,18 @@ return
 Massplacement:
 Gui, Templates:Submit, NoHide
 Gui, Templates:Destroy
-;Winactivate, EzCad
 sleep 200
 loop %Brelok_Amount%
 {
-	Click, 70 130 ; Click1
+	If WinActive("EzCad")
+		Click, 70 130 ; Click1
+	If WinActive("BslAppSimple")
+	{
+		Click, 90 190 ; Click1
+		SendInput {home}
+		sleep 600
+		Click, 90 190 ; Click1
+	}
 	sleep % 100*CadDelay1					;задержка1
 	Placement(MAKETTYPE, A_Index)
 	sleep % 100*CadDelay1					;задержка2
@@ -650,6 +658,8 @@ loop %Brelok_Amount%
 return
 
 Placement(MAKETTYPE, Line) ; Расстановка макетов
+{
+If WinActive("EzCad")
 {
 FileReadLine, The_Line, %MAKETTYPE%.txt, Line
 StringSplit, Coords, The_Line, %A_Space%
@@ -680,6 +690,39 @@ Click, 1775 280 ; Click4
 sleep 200
 Click, %MouseX% %MouseY%, 0
 }
+If WinActive("BslAppSimple")
+{
+FileReadLine, The_Line, %MAKETTYPE%.txt, Line
+StringSplit, Coords, The_Line, %A_Space%
+MouseGetPos, MouseX, MouseY
+Click, %Cadclick1% ; Ввод координат
+sleep 100
+Sendinput {bs 10}
+sleep 50
+SendInput %Coords1%{Tab}
+sleep 50
+SendInput %Coords2%{Tab 2}
+sleep 50
+If Coords3
+	SendInput %Coords3%{Tab}
+else 
+	SendInput {Tab}
+sleep 50
+If Coords4
+	SendInput %Coords4%{enter}
+else 
+	SendInput {enter}
+sleep 100
+Click, 490 80 ; Click3
+sleep 100
+Sendinput {enter}
+sleep 200
+Click, 1740 330 ; Click4
+sleep 200
+Click, %MouseX% %MouseY%, 0
+}
+}
+
 
 Numpad1::
 Placement("Жетоны", 1)
@@ -805,6 +848,7 @@ Placement("Плашки", 10)
 return
 
 } ; /Сувенирка
+
 
 #If (DEPARTMENT == "УФ печать") ; УФ синий принтер
 {
