@@ -8,7 +8,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 4.0
+Script_Version := 4.1
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -949,21 +949,14 @@ UVPlacement(MAKETTYPE, Line) ; Расстановка макетов
 
 !2::
 KeyWait, Lalt
-MouseGetPos, MouseX, MouseY
-Gui, NocaiTemplates:Add, Text, y+10, Тип:
-Gui, NocaiTemplates:Add, DropDownList, w150 x+2 vMAKETTYPE, Жетоны||Чехлы
-Gui, NocaiTemplates:Add, Text, xs y+5, Кол-во макетов:
-Gui, NocaiTemplates:Add, Edit, w60 x+3 vBrelok_Amount
-Gui, NocaiTemplates:Add, Button, xs gNocaiMassplacement default, OK  ; OK
-Gui, NocaiTemplates:Show, w220 h100
+Gui, Templates:Add, Text, y+10, Тип:
+Gui, Templates:Add, DropDownList, w150 x+2 vMAKETTYPE, Жетоны||Плашки|Лезвия|Лезвия большие|Косточки М|Косточки СР|Косточки Б|Круги|Столбики|Металлические браслеты|Двойные браслеты|Кулоны|Резина|Ручка Slim (колпачок)|Ручка Slim (основание)|Ручка Стилус (колпачок)|Ручка Стилус (основание)|Пазлы левые|Пазлы правые|Флешки|Дер. брелки|Дер. круги
+Gui, Templates:Add, Text, xs y+5, Кол-во макетов:
+Gui, Templates:Add, Edit, w60 x+3 vBrelok_Amount
+Gui, Templates:Add, Button, xs gMassplacement default, OK  ; OK
+Gui, Templates:Show, w220 h100
 WinSet, AlwaysOnTop, On, %A_ScriptName%
-GuiControl, NocaiTemplates:Focus, Brelok_Amount
-Gui, NocaiTemplates:Add, Text, xs y+5, Кол-во макетов:
-Gui, NocaiTemplates:Add, Edit, w60 x+3 vBrelok_Amount
-Gui, NocaiTemplates:Add, Button, xs gNocaiMassplacement default, OK  ; OK
-Gui, NocaiTemplates:Show, w220 h100
-WinSet, AlwaysOnTop, On, %A_ScriptName%
-GuiControl, NocaiTemplates:Focus, Brelok_Amount
+GuiControl, Templates:Focus, Brelok_Amount
 return
 
 NocaiTemplatesGuiClose:
