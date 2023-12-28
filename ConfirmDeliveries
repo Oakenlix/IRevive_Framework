@@ -8,9 +8,9 @@ StringCaseSense, Locale
 
 
 ; ОБНОВЛЕНИЕ
-Script_Version := 1.0
+Script_Version := 1.1
 
-Updated_Text := URLDownloadToVar("https://raw.githubusercontent.com/Oakenlix/IRevive_Framework/main/ConfirmDelivery")
+Updated_Text := URLDownloadToVar("https://raw.githubusercontent.com/Oakenlix/IRevive_Framework/main/ConfirmDeliveries")
 RegexMatch(Updated_Text, "Script_Version := (\d.\d)", Updated_Version)
 If Updated_Version1
 and (Updated_Version1 != Script_Version)
