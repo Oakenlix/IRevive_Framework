@@ -8,7 +8,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 4.3
+Script_Version := 4.4
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -113,7 +113,7 @@ LoadMainGUI()
 {
 	global
 	Gui, Add, Button,, Помощь
-	Gui, Add, Text, xs y+15, Настройки
+	Gui, Add, Text, xs y+15, Настройки:
 	Gui, Add, Text, xs, Имя:
 	Gui, Add, Edit, w100 x+3 gGUI_updatesettings vUSERNAME, % username
 	Gui, Add, Text, x+3, Отдел:
@@ -196,7 +196,7 @@ If !SetOnTop
 	WinSet, AlwaysOnTop, Off, %A_ScriptName%
 return
 
-ButtonНастройки:
+ButtonМеню:
 ExitFunc(MARKETPLACE)
 MARKETPLACE := 
 SHOP_ID :=
@@ -235,14 +235,17 @@ Clipboard := ListviewContent
 return
 
 ButtonПереместить:
-If !APIKEY
+If !SHOP_ID
 {
-	MsgBox, Не выбран магазин
+	MsgBox, 262144, Ошибка, Не выбран магазин
 	return
 }
-InputBox, supplyId, %A_ScriptName%, Введите ID поставки, , 250, 130
+InputBox, supplyId, %A_ScriptName%, Введите ID существующей поставки или название новой, , 250, 150
+
 If supplyId and !ErrorLevel
 {
+	If !RegexMatch(supplyId, "WB-GI-")
+		supplyId := WB_Create(supplyId)
 	Loop % LV_GetCount()
 	{
 		LV_GetText(RowText, 1, 1) 
@@ -251,6 +254,40 @@ If supplyId and !ErrorLevel
 		else break
 	}
 }
+return
+
+AddToDeliveries:
+Gui, AddToDeliveries:Add, Text, y+10, Тип товара:
+Gui, AddToDeliveries:Add, DropDownList, w120 x+2 vMAKETTYPE, Чехлы||
+Gui, AddToDeliveries:Add, Button, xs gSortingToDeliveries default, OK  ; OK
+Gui, AddToDeliveries:Show, w220 h100
+WinSet, AlwaysOnTop, On, %A_ScriptName%
+return
+
+AddToDeliveriesGuiClose:
+Gui, AddToDeliveries:destroy
+return
+
+SortingToDeliveries:
+Gui, AddToDeliveries:Submit, NoHide
+Gui, AddToDeliveries:Destroy
+/*
+Loop % LV_GetCount()
+	{
+		LV_GetText(RowText, 1, 1) 
+				If InStr(RowText, "Чехол") 
+				and InStr(RowText, "Жетон")
+				or InStr(RowText, "Подвес")
+				or InStr(RowText, "Кулон") 
+				or InStr(RowText, "Зажигалк") 
+				or InStr(RowText, "PNPMetall") 
+		
+		If W_MOVE(RowText, supplyId)
+			LV_Delete(1)
+		else break
+	}
+*/
+MsgBox, Это пока не готово
 return
 
 { ; API ключи
@@ -404,6 +441,8 @@ Alt+1 - перейти к следующему заказу
 Клик на заголовок столбца - сортировка по алфавиту
 
 С вопросами обращайтесь к Саше Н.
+
+Отдельная благодарность Аслану за идеи и тестировку скрипта.
 )
 Gui, About:+owner1  ; Make the main window (Gui #1) the owner of the "about box".
 Gui +Disabled  ; Disable main window.
@@ -460,7 +499,7 @@ Loop, parse, Clipboard, `n
 	SendInput {enter}
 }
 sleep 300
-MsgBox, Готово
+MsgBox, 262144,, Готово
 return
 
 F4::
@@ -492,7 +531,7 @@ If (MARKETPLACE != "OZON") and MPTEST[4] and RegexMatch(MPTEST[1], "\d+-\d{4}-\d
 		Gui, Add, DropDownList, w110 x+1 vSHOP_ID gSHOP_ID, PNP|PNPGROUPP|PNPMetall|UEGrafic|ПНП-Групп|Просто надо|Родионова Е. Ю.|Родионова Н. К.
 	If (DEPARTMENT == "УФ печать")
 		Gui, Add, DropDownList, w110 x+1 vSHOP_ID gSHOP_ID, PNPColor|UFpnpColor
-	Gui, Add, Button, x+3, Настройки
+	Gui, Add, Button, x+3, Меню
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Артикул|Количество|Название
 }
 If (MARKETPLACE != "YANDEX") and MPTEST[4] and RegexMatch(MPTEST[1], "[0-9]{9}") and !InStr(MPTEST[1], "-") ; Если ЯНДЕКС
@@ -507,7 +546,7 @@ If (MARKETPLACE != "YANDEX") and MPTEST[4] and RegexMatch(MPTEST[1], "[0-9]{9}")
 		Gui, Add, DropDownList, w110 x+1 vSHOP_ID gSHOP_ID, IRevive|UEGrafic|UEbrelki
 	If (DEPARTMENT == "УФ печать")
 		Gui, Add, DropDownList, w110 x+1 vSHOP_ID gSHOP_ID, IRevive|UEGrafic|UEbrelki
-	Gui, Add, Button, x+3, Настройки
+	Gui, Add, Button, x+3, Меню
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Название|Артикул|Количество
 }
 If !MPTEST[4] and (MARKETPLACE != "WB") 										; Если ВБ
@@ -517,11 +556,11 @@ If !MPTEST[4] and (MARKETPLACE != "WB") 										; Если ВБ
 	MARKETPLACE := "WB"	
 	Gui, Add, Text,, WB ИП:
 	Gui, Add, DropDownList, w70 x+1 vSHOP_ID gSHOP_ID, 1|2|3|4
-	Gui, Add, Button, x+3 vMoveOrders, Переместить
-	Gui, Add, Button, x+3, Настройки
+	Gui, Add, Button, x+3, Переместить
+	Gui, Add, Button, x+3 gAddToDeliveries, Добавить в поставки
+	Gui, Add, Button, x+3, Меню
 	Gui, Add, ListView, xs w400 h300 vMyTable gMyTable LV0x100 Grid Checked AltSubmit Count100, Номер|Название|Артикул|Этикетка
 }
-
 LoadTable()
 
 Loop 4
@@ -584,9 +623,6 @@ If (MARKETPLACE == "YANDEX")
 	YANDEX1()
 return
 
-!2::
-O_Orders(p := False)
-return
 } ; /Аксы/Пленка
 
 #If (DEPARTMENT == "Сувенирка")
@@ -1355,6 +1391,34 @@ O_PIC(OrderID, p := False) ; Получить информацию о заказ
 } ; /OZON API
 
 { ; WB API
+
+WB_CREATE(supplyId) { ; ################################################### Создание поставки
+	try
+	{
+		;body := {"orders": [OrderID]} ; this is now an ahk object
+		body := {"name":SupplyID}
+		WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+		WebRequest.Open("POST", "https://suppliers-api.wildberries.ru/api/v3/supplies")
+		WebRequest.SetRequestHeader("Content-Type", "application/json")
+		WebRequest.setRequestHeader("Accept", "application/json")
+		WebRequest.SetRequestHeader("Authorization", APIKEY)
+		WebRequest.Send(JSON.Dump(body))
+		httpStatus := WebRequest.Status
+		arr := WebRequest.responseBody
+		pData := NumGet(ComObjValue(Arr) + 8 + A_PtrSize)
+		length := Arr.MaxIndex() + 1
+		response := StrGet(pData, length, "UTF-8")
+		Result := {"result": p ? JSON.Load(response) : response, "status": httpStatus}
+		Append := % Result["result"]
+		RegexMatch(Append, """id"":""(.*)""", Result) ; Заходим Id созданной поставки
+		return Result1
+	}
+	catch
+	{
+		MsgBox, 262144, Ошибка, Не удалось переместить заказ.
+		return
+	}
+}
 
 W_MOVE(orderId, supplyId) { ; ################################################### Перемещение в поставку
 	try
