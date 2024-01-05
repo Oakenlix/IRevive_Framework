@@ -8,7 +8,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 4.4
+Script_Version := 4.5
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -659,6 +659,20 @@ return
 
 !2::
 KeyWait, Lalt
+
+/*
+Loop, Files, %A_ScriptDir%\*.txt
+{
+	
+}
+dropDownList=|
+Loop, READ, Projects.txt
+	dropDownList .=	"|" A_LoopReadLine
+Gui, Add, DropDownList, x130 y75 w240 h20 vProject +R5, %dropDownList%
+*/
+
+
+
 Gui, Templates:Add, Text, y+10, Тип:
 Gui, Templates:Add, DropDownList, w150 x+2 vMAKETTYPE, Жетоны||Плашки|Лезвия|Лезвия большие|Косточки М|Косточки СР|Косточки Б|Круги|Столбики|Металлические браслеты|Двойные браслеты|Кулоны|Резина|Ручка Slim (колпачок)|Ручка Slim (основание)|Ручка Стилус (колпачок)|Ручка Стилус (основание)|Пазлы левые|Пазлы правые|Флешки|Дер. брелки|Дер. круги
 Gui, Templates:Add, Text, xs y+5, Кол-во макетов:
@@ -1571,7 +1585,7 @@ If WinActive("ahk_exe chrome.exe") or WinActive("ahk_exe browser.exe")
 		CopyYandex()
 		Sorting(2)
 	}
-	If InStr(Clipboard, "2023") and InStr(Clipboard, "Арт.")
+	If InStr(Clipboard, "2024") and InStr(Clipboard, "Арт.")
 	{
 		MARKETPLACE_COPY := "WB"
 		CopyWB()
