@@ -8,7 +8,7 @@ StringCaseSense, Locale
 
 { ; СТАРТ
 
-Script_Version := 4.5
+Script_Version := 4.6
 
 global Center_X := A_ScreenWidth/2
 global Center_Y := A_ScreenHeight/2
@@ -1572,8 +1572,9 @@ IniRead()
 OnClipboardChange:
 If WinActive("ahk_exe chrome.exe") or WinActive("ahk_exe browser.exe")
 {
+	WinGetActiveTitle, Title
 	global MARKETPLACE_COPY :=
-	If RegexMatch(Clipboard, "\d+-\d{4}-\d+", Result) and InStr(Clipboard, "доставка Ozon")
+	If RegexMatch(Clipboard, "\d+-\d{4}-\d+", Result) and InStr(Clipboard, "Распечатать маркировку") or InStr(Clipboard, "Собрать")
 	{
 		MARKETPLACE_COPY := "OZON"
 		CopyOzon()
