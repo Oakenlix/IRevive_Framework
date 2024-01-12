@@ -6,7 +6,7 @@ StringCaseSense, Locale
 #SingleInstance Force
 #Include <JSON> ; AHK-JSON lib ; https://github.com/cocobelgica/AutoHotkey-JSON
 
-
+Script_Version := 9.9
 
 FileRemoveDir, Backups, 1
 
