@@ -7,43 +7,6 @@ StringCaseSense, Locale
 #Include <JSON> ; AHK-JSON lib ; https://github.com/cocobelgica/AutoHotkey-JSON
 
 
-Script_Version := 5.0
-
-global Center_X := A_ScreenWidth/2
-global Center_Y := A_ScreenHeight/2
-
-
-
-Updated_Text := URLDownloadToVar("https://raw.githubusercontent.com/Oakenlix/IRevive_Framework/main/Main")
-RegexMatch(Updated_Text, "Script_Version := (\d.\d)", Updated_Version)
-If Updated_Version1
-and (Updated_Version1 != Script_Version)
-{
-	FileCreateDir, %A_ScriptDir%\Backups
-	FileMove, %A_ScriptName%, %A_ScriptDir%\Backups\%A_Hour%%A_Min%-%A_DD%%A_MM%.ahk
-	FileAppend, %Updated_Text%, %A_ScriptName%
-	sleep 100
-	Run, %A_ScriptName%
-	ExitApp
-}
-Updated_Text :=
-	
-URLDownloadToVar(url) 
-{
-	try  ; Attempts to execute code.
-	{
-		WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-		WebRequest.Open("GET", url)
-		WebRequest.Send()
-		Return, WebRequest.ResponseText
-	}
-	catch  ; Handles the first error/exception raised by the block above.
-	{
-		MsgBox, 262144, Ошибка, Нет подключения к интернету. Некоторые функции не будут работать.
-	}
-}
-
-; ####################################### Загрузка настроек
 
 FileRemoveDir, Backups, 1
 
